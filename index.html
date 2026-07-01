@@ -1418,7 +1418,6 @@
 
 <div id="debug-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:#a8341f; color:#fff; font-family:'JetBrains Mono',monospace; font-size:12px; padding:12px 16px; z-index:9999; white-space:pre-wrap; line-height:1.5;"></div>
 
-<div id="diag-tag" style="position:fixed; top:10px; left:10px; z-index:9999; background:#111319; color:#39ff88; border:1px solid #2a2e3a; font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 12px; border-radius:6px; white-space:pre-line; opacity:0.95;"></div>
 
 <div id="toast-container" style="position:fixed; bottom:24px; right:24px; z-index:500; display:flex; flex-direction:column; gap:10px;"></div>
 
@@ -1836,19 +1835,6 @@
     }
   });
 
-  /* ---------- Temporary diagnostic tag — tells us exactly what your browser is doing ---------- */
-  (function () {
-    const tag = document.getElementById('diag-tag');
-    const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const hasPreloader = !!document.getElementById('preloader');
-    const ua = navigator.userAgent.slice(0, 40);
-    tag.textContent =
-      'DIAG — reduced motion: ' + (rm ? 'YES (animations disabled)' : 'no') +
-      '\npreloader in DOM: ' + hasPreloader +
-      '\nviewport: ' + window.innerWidth + 'x' + window.innerHeight +
-      '\n' + ua;
-    setTimeout(() => { tag.style.transition = 'opacity 0.5s ease'; tag.style.opacity = '0'; }, 12000);
-  })();
   /* ---------- Preloader: flowing gradient + percentage counter ---------- */
   (function () {
     const pre = document.getElementById('preloader');
