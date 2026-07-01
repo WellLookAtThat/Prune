@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prune — Cut the AI tools you don't use</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --void: #07080a;
+    --void-2: #111319;
+    --void-3: #1a1d26;
+    --line: #2a2e3a;
+    --ember: #ff4426;
+    --ember-glow: #ff6a4d;
+    --acid: #39ff88;
+    --violet: #8b5cf6;
+    --ice: #f2f4f8;
+    --smoke: #8d94a3;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--void);
+    color: var(--ice);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  canvas#field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .content { position: relative; z-index: 1; }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  ::selection { background: var(--ember); color: var(--void); }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    background: rgba(7,8,10,0.6);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 28px;
+  }
+  .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand .cut-mark { color: var(--ember); }
+  .nav-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--smoke);
+    letter-spacing: 0.08em;
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 3px;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 0 40px;
+    position: relative;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ember-glow);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eyebrow .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ember);
+    box-shadow: 0 0 10px 2px var(--ember);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  h1.headline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(38px, 7vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 0 0 24px;
+  }
+  h1.headline .glitch-word {
+    color: var(--ember);
+    position: relative;
+    display: inline-block;
+  }
+  h1.headline .glitch-word.active::before,
+  h1.headline .glitch-word.active::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+    overflow: hidden;
+    clip-path: inset(0 0 0 0);
+  }
+  h1.headline .glitch-word.active::before {
+    color: var(--violet);
+    animation: glitch-1 2.4s infinite linear;
+  }
+  h1.headline .glitch-word.active::after {
+    color: var(--acid);
+    animation: glitch-2 3.1s infinite linear;
+  }
+  @keyframes glitch-1 {
+    0%, 92%, 100% { clip-path: inset(0 0 0 0); transform: translate(0,0); opacity: 0; }
+    93% { clip-path: inset(10% 0 60% 0); transform: translate(-3px,1px); opacity: 0.8; }
+    95% { clip-path: inset(60% 0 5% 0); transform: translate(3px,-1px); opacity: 0.8; }
+    97% { clip-path: inset(30% 0 40% 0); transform: translate(-2px,0); opacity: 0.6; }
+  }
+  @keyframes glitch-2 {
+    0%, 90%, 100% { clip-path: inset(0 0 0 0); transform: translate(0,0); opacity: 0; }
+    91% { clip-path: inset(70% 0 5% 0); transform: translate(2px,-1px); opacity: 0.7; }
+    94% { clip-path: inset(15% 0 55% 0); transform: translate(-3px,1px); opacity: 0.7; }
+    96% { clip-path: inset(45% 0 20% 0); transform: translate(2px,0); opacity: 0.5; }
+  }
+
+  .sub {
+    font-size: 18px;
+    color: var(--smoke);
+    max-width: 54ch;
+    margin: 0 0 36px;
+    line-height: 1.6;
+  }
+
+  .cta-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 15px 26px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    text-decoration: none;
+  }
+  .btn.primary {
+    background: var(--ember);
+    color: var(--void);
+    box-shadow: 0 0 0 0 rgba(255,68,38,0.5);
+    transition: box-shadow 0.3s ease, transform 0.15s ease;
+  }
+  .btn.primary:hover {
+    box-shadow: 0 0 32px 4px rgba(255,68,38,0.55);
+    transform: translateY(-1px);
+  }
+  .btn.ghost {
+    background: transparent;
+    color: var(--ice);
+    border: 1px solid var(--line);
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .btn.ghost:hover { border-color: var(--acid); color: var(--acid); }
+  .cta-note { font-size: 13px; color: var(--smoke); font-family: 'JetBrains Mono', monospace; }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 18px; left: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--smoke);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scroll-cue .bar {
+    width: 1px; height: 26px;
+    background: linear-gradient(var(--ember), transparent);
+    animation: scroll-bar 1.6s ease-in-out infinite;
+  }
+  @keyframes scroll-bar {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* TERMINAL / RECEIPT SECTION */
+  section { padding: 90px 0; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin-bottom: 18px;
+  }
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 4vw, 38px);
+    margin: 0 0 30px;
+    letter-spacing: -0.01em;
+  }
+
+  .terminal {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.6);
+  }
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--void-3);
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--smoke);
+  }
+  .terminal-bar .tdot { width: 9px; height: 9px; border-radius: 50%; }
+  .terminal-bar .tdot:nth-child(1) { background: #ff5f57; }
+  .terminal-bar .tdot:nth-child(2) { background: #febc2e; }
+  .terminal-bar .tdot:nth-child(3) { background: #28c840; }
+  .terminal-bar span.path { margin-left: 10px; }
+
+  .row-list { padding: 6px 0; }
+  .line-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  .line-item:last-child { border-bottom: none; }
+  .li-name { font-weight: 500; color: var(--ice); }
+  .li-note { grid-column: 1/-1; color: var(--smoke); font-size: 12px; margin-top: -8px; }
+  .li-price { text-align: right; color: var(--ice); transition: color 0.3s ease, text-decoration 0.3s ease; }
+
+  .laser {
+    position: absolute;
+    top: 0; left: -10%;
+    width: 4px; height: 100%;
+    background: var(--ember);
+    box-shadow: 0 0 20px 4px var(--ember-glow), 0 0 40px 10px rgba(255,68,38,0.5);
+    opacity: 0;
+  }
+  .line-item.cut .laser,
+  .sub-row.cut .laser {
+    animation: laser-sweep 0.55s cubic-bezier(.7,0,.3,1) forwards;
+  }
+  @keyframes laser-sweep {
+    0% { left: -5%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { left: 105%; opacity: 0; }
+  }
+  .line-item.cut .li-price {
+    color: var(--ember-glow);
+    text-decoration: line-through;
+    text-decoration-color: var(--ember);
+  }
+  .line-item.cut .li-name::after {
+    content: "— cut";
+    color: var(--ember-glow);
+    font-size: 11px;
+    margin-left: 10px;
+    opacity: 0;
+  }
+  .line-item.cut.done .li-name::after { opacity: 1; transition: opacity 0.3s ease 0.4s; }
+
+  .line-item.keep .li-price { color: var(--acid); }
+  .line-item.keep .li-name::after {
+    content: "— keeping";
+    color: var(--acid);
+    font-size: 11px;
+    margin-left: 10px;
+    opacity: 0.85;
+  }
+
+  .spark {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--ember-glow);
+    top: 50%; left: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .terminal-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 22px 24px;
+    background: var(--void-3);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .terminal-total .label { font-size: 13px; color: var(--smoke); }
+  .terminal-total .amount {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ember);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .terminal-total .amount .yr { font-size: 13px; color: var(--smoke); font-family: 'JetBrains Mono', monospace; font-weight: 400; }
+
+  /* PROBLEM */
+  .problem-text {
+    color: var(--smoke);
+    max-width: 58ch;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  .problem-text strong { color: var(--ice); font-weight: 600; }
+
+  /* STEPS */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .step {
+    background: var(--void-2);
+    padding: 28px 24px;
+    transition: background 0.3s ease;
+  }
+  .step:hover { background: var(--void-3); }
+  .step .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ember-glow);
+    display: block;
+    margin-bottom: 12px;
+  }
+  .step h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    margin: 0 0 10px;
+    font-weight: 600;
+  }
+  .step p { font-size: 14px; color: var(--smoke); margin: 0; line-height: 1.6; }
+
+  /* PRICING */
+  .pricing-box {
+    background: linear-gradient(160deg, var(--void-2), var(--void-3));
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pricing-box::before {
+    content: "";
+    position: absolute;
+    width: 340px; height: 340px;
+    background: radial-gradient(circle, rgba(139,92,246,0.25), transparent 70%);
+    top: -140px; right: -100px;
+    pointer-events: none;
+  }
+  .price-fig {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 46px;
+    font-weight: 700;
+    position: relative;
+  }
+  .price-fig span { font-size: 14px; font-family: 'JetBrains Mono', monospace; color: var(--smoke); font-weight: 400; }
+  .price-detail { font-size: 14px; color: var(--smoke); max-width: 32ch; margin-top: 10px; line-height: 1.6; }
+
+  form.waitlist { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; position: relative; }
+  input[type="email"] {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--void);
+    color: var(--ice);
+    flex: 1;
+    min-width: 220px;
+  }
+  input[type="email"]:focus { outline: none; border-color: var(--acid); box-shadow: 0 0 0 3px rgba(57,255,136,0.15); }
+  .confirm {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--acid);
+    margin-top: 14px;
+    display: none;
+  }
+  .confirm.show { display: block; }
+
+  footer {
+    padding: 40px 0 70px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--smoke);
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    margin-top: 20px;
+  }
+
+  /* AUTH MODAL */
+  .auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7,8,10,0.85);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .auth-overlay.show { display: flex; }
+  .auth-card {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 380px;
+    padding: 30px;
+    position: relative;
+  }
+  .auth-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none;
+    border: none;
+    color: var(--smoke);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .auth-close:hover { color: var(--ice); }
+  .auth-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+  .auth-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--smoke);
+    margin: 0 0 22px;
+  }
+  .auth-field { margin-bottom: 14px; }
+  .auth-field label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--smoke);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+  .auth-field input {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--void);
+    color: var(--ice);
+  }
+  .auth-field input:focus { outline: none; border-color: var(--acid); box-shadow: 0 0 0 3px rgba(57,255,136,0.15); }
+  .auth-submit { width: 100%; text-align: center; margin-top: 6px; }
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--smoke);
+  }
+  .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .auth-google {
+    width: 100%;
+    background: var(--ice);
+    color: var(--void);
+    border: none;
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .auth-google:hover { background: #dcdfe5; }
+  .auth-switch {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--smoke);
+  }
+  .auth-switch button {
+    background: none;
+    border: none;
+    color: var(--acid);
+    cursor: pointer;
+    font-size: 13px;
+    text-decoration: underline;
+    padding: 0;
+  }
+  .auth-error {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ember-glow);
+    margin-top: 12px;
+    display: none;
+  }
+  .auth-error.show { display: block; }
+  .auth-loggedin {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .auth-loggedin .email-tag { color: var(--acid); }
+
+  /* DASHBOARD */
+  body.in-dashboard #marketing-wrap { display: none; }
+  #dashboard-view { display: none; min-height: 100vh; }
+  body.in-dashboard #dashboard-view { display: block; }
+
+  .dash-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(7,8,10,0.7);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .dash-workspace {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--smoke);
+  }
+  .dash-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 28px 90px;
+  }
+  .demo-badge-banner {
+    background: rgba(139,92,246,0.12);
+    border: 1px solid var(--violet);
+    color: var(--violet);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 28px;
+  }
+  .dash-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  .dash-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 12px 18px;
+    background: none;
+    border: none;
+    color: var(--smoke);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .dash-tab:hover { color: var(--ice); }
+  .dash-tab.active { color: var(--ice); border-bottom-color: var(--ember); }
+  .dash-panel { display: none; }
+  .dash-panel.active { display: block; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+  .stat-card { background: var(--void-2); padding: 22px 20px; }
+  .stat-card .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--smoke);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .stat-card .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; }
+  .stat-card.ember .stat-value { color: var(--ember); }
+  .stat-card.acid .stat-value { color: var(--acid); }
+
+  .dash-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .dash-section-head h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin: 0; }
+
+  .add-row-form {
+    display: none;
+    grid-template-columns: 2fr 1fr 1.6fr auto auto;
+    gap: 10px;
+    padding: 16px;
+    background: var(--void-3);
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .add-row-form.show { display: grid; }
+  .add-row-form input, .add-row-form select {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--void);
+    color: var(--ice);
+    width: 100%;
+  }
+
+  .sub-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2fr auto auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    overflow: hidden;
+  }
+  .sub-row:last-child { border-bottom: none; }
+  .sub-main { display: flex; flex-direction: column; gap: 3px; }
+  .sub-name { color: var(--ice); font-weight: 500; }
+  .sub-note { color: var(--smoke); font-size: 11px; }
+  .sub-price { color: var(--ice); text-align: right; transition: color 0.3s ease; }
+  .sub-row.cut .sub-price { color: var(--ember-glow); text-decoration: line-through; text-decoration-color: var(--ember); }
+  .sub-row.keep .sub-price { color: var(--acid); }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    justify-self: start;
+  }
+  .badge.keep { color: var(--acid); border: 1px solid var(--acid); }
+  .badge.cut { color: var(--ember-glow); border: 1px solid var(--ember); }
+
+  .row-actions { display: flex; gap: 8px; }
+  .row-actions button {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--smoke);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .row-actions button:hover { color: var(--ice); border-color: var(--ice); }
+  .row-actions button.danger:hover { color: var(--ember-glow); border-color: var(--ember); }
+
+  .activity-feed { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .activity-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--smoke);
+    background: var(--void-2);
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-item .a-tag { color: var(--ice); }
+
+  .settings-block {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 26px;
+    margin-bottom: 20px;
+  }
+  .settings-block h4 { font-family: 'Space Grotesk', sans-serif; margin: 0 0 16px; font-size: 15px; }
+  .settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--smoke);
+  }
+  .settings-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .settings-row .s-label { color: var(--ice); }
+
+  .toggle-switch {
+    width: 38px; height: 20px;
+    background: var(--void-3);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .toggle-switch.on { background: var(--acid); border-color: var(--acid); }
+  .toggle-switch .knob {
+    width: 14px; height: 14px;
+    background: var(--ice);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: left 0.2s ease;
+  }
+  .toggle-switch.on .knob { left: 20px; background: var(--void); }
+
+  @media (max-width: 640px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .add-row-form { grid-template-columns: 1fr; }
+    .sub-row { grid-template-columns: 1fr auto; }
+    .sub-row .badge { grid-column: 1/-1; }
+    .sub-row .row-actions { grid-column: 1/-1; }
+  }
+    .steps { grid-template-columns: 1fr; }
+    .line-item { grid-template-columns: 1fr auto; }
+    .li-price { grid-row: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="field"></canvas>
+
+<div id="debug-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:#a8341f; color:#fff; font-family:'JetBrains Mono',monospace; font-size:12px; padding:12px 16px; z-index:9999; white-space:pre-wrap; line-height:1.5;"></div>
+
+<div class="content">
+
+  <nav>
+    <div class="wrap">
+      <div class="brand"><span class="cut-mark">✂</span>Prune</div>
+      <div id="nav-auth-area">
+        <button class="btn ghost" id="nav-signin-btn" style="padding:8px 16px; font-size:12px;">Sign in</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap" id="marketing-wrap">
+
+    <section class="hero">
+      <div class="eyebrow"><span class="dot"></span>Your team is bleeding money right now</div>
+      <h1 class="headline">
+        Stop paying for<br>
+        AI tools you <span class="glitch-word" data-text="never">never</span> touch.
+      </h1>
+      <p class="sub">Prune watches every AI subscription your team pays for, tracks who's actually using what, and hands you a one-click cut list every month. No dashboard to babysit. Just the truth, itemized.</p>
+
+      <div class="cta-row">
+        <a href="#" class="btn primary js-auth-open">Join the waitlist</a>
+        <button class="btn ghost" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">See it cut something ↓</button>
+      </div>
+      <p class="cta-note">Takes 10 seconds. No card, no spam.</p>
+
+      <div class="scroll-cue"><div class="bar"></div>SCROLL</div>
+    </section>
+
+    <section id="demo">
+      <div class="section-label">Live audit</div>
+      <h2>Watch Prune cut the fat.</h2>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
+          <span class="path">prune — audit — acme-studio.workspace</span>
+        </div>
+        <div class="row-list" id="row-list">
+          <div class="line-item" data-type="keep">
+            <span class="laser"></span>
+            <span class="li-name">ChatGPT Team</span>
+            <span class="li-note">used by 6/6 seats, daily</span>
+            <span class="li-price">$30/mo</span>
+          </div>
+          <div class="line-item" data-type="cut">
+            <span class="laser"></span>
+            <span class="li-name">Notion AI</span>
+            <span class="li-note">unused 34 days · 1 seat active</span>
+            <span class="li-price">$20/mo</span>
+          </div>
+          <div class="line-item" data-type="keep">
+            <span class="laser"></span>
+            <span class="li-name">Midjourney</span>
+            <span class="li-note">used by design team, daily</span>
+            <span class="li-price">$30/mo</span>
+          </div>
+          <div class="line-item" data-type="cut">
+            <span class="laser"></span>
+            <span class="li-name">Jasper</span>
+            <span class="li-note">unused 61 days</span>
+            <span class="li-price">$49/mo</span>
+          </div>
+          <div class="line-item" data-type="cut">
+            <span class="laser"></span>
+            <span class="li-name">Copy.ai</span>
+            <span class="li-note">overlaps ChatGPT, barely used</span>
+            <span class="li-price">$36/mo</span>
+          </div>
+        </div>
+        <div class="terminal-total">
+          <span class="label">Waste identified this run</span>
+          <span class="amount" id="total-amount">$0<span class="yr"> / mo</span></span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-label">The problem</div>
+      <h2>Nobody signed up to be an AI subscription accountant.</h2>
+      <p class="problem-text">Most teams now run <strong>three to seven overlapping AI tools</strong> — picked up one at a time, by different people, for good reasons in the moment. Nobody's job is to notice when a $30/mo tool goes untouched for two months, or when two tools quietly do the exact same thing. So it just sits on the card, month after month, until someone finally asks why.</p>
+    </section>
+
+    <section>
+      <div class="section-label">How it works</div>
+      <h2>Three steps. No new habits.</h2>
+      <div class="steps">
+        <div class="step">
+          <span class="num">01 / CONNECT</span>
+          <h3>Link your billing</h3>
+          <p>Forward receipts or connect your card statement. Two minutes, zero engineering.</p>
+        </div>
+        <div class="step">
+          <span class="num">02 / TRACK</span>
+          <h3>We watch real usage</h3>
+          <p>Prune checks login and activity signals against what you're paying for, quietly.</p>
+        </div>
+        <div class="step">
+          <span class="num">03 / CUT</span>
+          <h3>Get your monthly report</h3>
+          <p>One email. What's earning its keep, what's not, and a one-click cancel link.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-label">Pricing</div>
+      <h2>One plan. No tiers to game.</h2>
+      <div class="pricing-box">
+        <div class="price-fig">$29<span>/month, per workspace</span></div>
+        <p class="price-detail">Unlimited seats and tools tracked. Cancel anytime — most teams save more than they pay us in month one.</p>
+        <div style="margin-top: 22px; position: relative;">
+          <a href="#" class="btn primary js-auth-open">Join founding cohort ↗</a>
+          <p class="cta-note" style="margin-top: 12px;">Creates your account — takes 15 seconds.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>PRUNE — subscription audits, done honestly.</span>
+      <span>hello@prune.example</span>
+    </footer>
+
+  </div>
+</div>
+
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-card">
+    <button class="auth-close" id="auth-close">✕</button>
+    <h3>Sign in to Prune</h3>
+    <p class="auth-sub">Demo build — real accounts land later. Use the demo credentials below to look around.</p>
+
+    <button class="auth-google" disabled title="Coming with real accounts" style="opacity:0.45; cursor:not-allowed;">
+      <span>Continue with Google (coming soon)</span>
+    </button>
+
+    <div class="auth-divider">OR</div>
+
+    <form id="auth-form">
+      <div class="auth-field">
+        <label for="auth-email">Username</label>
+        <input type="text" id="auth-email" required autocomplete="username">
+      </div>
+      <div class="auth-field">
+        <label for="auth-password">Password</label>
+        <input type="password" id="auth-password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn primary auth-submit" id="auth-submit-btn">Enter demo dashboard</button>
+      <p class="auth-error" id="auth-error"></p>
+    </form>
+
+    <p class="auth-switch">
+      Demo credentials: <strong style="color:var(--ice);">admin</strong> / <strong style="color:var(--ice);">pass</strong>
+      — <button type="button" id="auth-fill-demo">fill for me</button>
+    </p>
+  </div>
+</div>
+
+<div id="dashboard-view">
+  <div class="dash-topbar">
+    <div class="brand"><span class="cut-mark">✂</span>Prune</div>
+    <div class="dash-workspace">Acme Studio · Demo workspace</div>
+  </div>
+  <div class="dash-wrap">
+    <div class="demo-badge-banner">⚠ Demo mode — this is sample data showing how Prune works. Nothing here is connected to real billing yet.</div>
+
+    <div class="dash-tabs">
+      <button class="dash-tab active" data-tab="overview">Overview</button>
+      <button class="dash-tab" data-tab="subs">Subscriptions</button>
+      <button class="dash-tab" data-tab="settings">Settings</button>
+    </div>
+
+    <div class="dash-panel active" id="panel-overview">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Monthly spend</div><div class="stat-value" id="stat-total">$0</div></div>
+        <div class="stat-card ember"><div class="stat-label">Waste flagged</div><div class="stat-value" id="stat-waste">$0</div></div>
+        <div class="stat-card"><div class="stat-label">Tools tracked</div><div class="stat-value" id="stat-tools">0</div></div>
+        <div class="stat-card acid"><div class="stat-label">Annual savings if cut</div><div class="stat-value" id="stat-annual">$0</div></div>
+      </div>
+      <div class="dash-section-head"><h3>Recent activity</h3></div>
+      <div class="activity-feed" id="activity-feed"></div>
+    </div>
+
+    <div class="dash-panel" id="panel-subs">
+      <div class="dash-section-head">
+        <h3>All subscriptions</h3>
+        <button class="btn ghost" id="show-add-form" style="padding:10px 16px;font-size:13px;">+ Add subscription</button>
+      </div>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
+          <span class="path">prune — subscriptions — acme-studio.workspace</span>
+        </div>
+        <form class="add-row-form" id="add-sub-form">
+          <input type="text" id="add-name" placeholder="Tool name" required>
+          <input type="number" id="add-price" placeholder="$/mo" min="0" step="0.01" required>
+          <select id="add-usage">
+            <option>Used today</option>
+            <option>Used this week</option>
+            <option>Used this month</option>
+            <option>Unused 30+ days</option>
+            <option>Never used</option>
+          </select>
+          <button type="submit" class="btn primary" style="padding:9px 14px;font-size:12px;">Save</button>
+          <button type="button" class="btn ghost" id="cancel-add-form" style="padding:9px 14px;font-size:12px;">Cancel</button>
+        </form>
+        <div id="sub-list"></div>
+      </div>
+    </div>
+
+    <div class="dash-panel" id="panel-settings">
+      <div class="settings-block">
+        <h4>Account</h4>
+        <div class="settings-row"><span class="s-label">Signed in as</span><span>admin (demo)</span></div>
+        <div class="settings-row"><span class="s-label">Workspace</span><span>Acme Studio</span></div>
+        <div class="settings-row"><span class="s-label">Plan</span><span>Founding cohort — $29/mo (demo, not billed)</span></div>
+      </div>
+      <div class="settings-block">
+        <h4>Notifications</h4>
+        <div class="settings-row"><span class="s-label">Monthly cut-list email</span><div class="toggle-switch on" data-toggle><div class="knob"></div></div></div>
+        <div class="settings-row"><span class="s-label">Instant alerts for new waste</span><div class="toggle-switch" data-toggle><div class="knob"></div></div></div>
+      </div>
+      <div class="settings-block">
+        <h4>Danger zone</h4>
+        <div class="settings-row"><span class="s-label">Delete account</span><button class="btn ghost" disabled title="Disabled in demo mode" style="opacity:0.4;cursor:not-allowed;padding:8px 14px;font-size:12px;">Delete</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---------- Surface any JS error visibly — no devtools needed ---------- */
+  window.addEventListener('error', function(e) {
+    const b = document.getElementById('debug-banner');
+    if (b) {
+      b.style.display = 'block';
+      b.textContent = 'Something broke: ' + e.message + '  (line ' + e.lineno + ')';
+    }
+  });
+  /* ---------- Ember particle field ---------- */
+  const canvas = document.getElementById('field');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mouse = { x: -1000, y: -1000 };
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('mouseleave', () => { mouse.x = -1000; mouse.y = -1000; });
+
+  const colors = ['rgba(255,68,38,', 'rgba(139,92,246,', 'rgba(57,255,136,'];
+
+  function makeParticle() {
+    return {
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.6 + 0.4,
+      baseX: 0,
+      baseY: 0,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: -Math.random() * 0.25 - 0.05,
+      alpha: Math.random() * 0.5 + 0.15,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    };
+  }
+
+  const COUNT = reduceMotion ? 0 : Math.min(110, Math.floor((w * h) / 14000));
+  for (let i = 0; i < COUNT; i++) particles.push(makeParticle());
+
+  function tick() {
+    ctx.clearRect(0, 0, w, h);
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+
+      const dx = p.x - mouse.x, dy = p.y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        const force = (120 - dist) / 120;
+        p.x += (dx / (dist || 1)) * force * 2.2;
+        p.y += (dy / (dist || 1)) * force * 2.2;
+      }
+
+      if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+      if (p.x < -10) p.x = w + 10;
+      if (p.x > w + 10) p.x = -10;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + p.alpha + ')';
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = p.color + '0.8)';
+      ctx.fill();
+    }
+    if (!reduceMotion) requestAnimationFrame(tick);
+  }
+  tick();
+
+  /* ---------- Glitch headline activation ---------- */
+  const glitchWord = document.querySelector('.glitch-word');
+  if (glitchWord && !reduceMotion) {
+    setTimeout(() => glitchWord.classList.add('active'), 600);
+  }
+
+  /* ---------- Laser-cut reveal on the terminal rows ---------- */
+  let totalWaste = 0;
+  const totalEl = document.getElementById('total-amount');
+
+  function burstSparks(item) {
+    const rect = item.getBoundingClientRect();
+    for (let i = 0; i < 10; i++) {
+      const s = document.createElement('span');
+      s.className = 'spark';
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * 30;
+      s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      s.animate([
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`, opacity: 0 }
+      ], { duration: 500 + Math.random() * 300, easing: 'ease-out' });
+      item.appendChild(s);
+      setTimeout(() => s.remove(), 900);
+    }
+  }
+
+  const rowObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        const item = entry.target;
+        const type = item.dataset.type;
+        setTimeout(() => {
+          item.classList.add(type);
+          if (type === 'cut') {
+            burstSparks(item);
+            const price = parseInt(item.querySelector('.li-price').textContent.replace(/\D/g, ''));
+            totalWaste += price;
+            totalEl.innerHTML = '$' + totalWaste + '<span class="yr"> / mo · $' + (totalWaste * 12).toLocaleString() + '/yr</span>';
+            setTimeout(() => item.classList.add('done'), 500);
+          }
+        }, i * 220);
+        rowObserver.unobserve(item);
+      }
+    });
+  }, { threshold: 0.6 });
+
+  document.querySelectorAll('.line-item').forEach(item => rowObserver.observe(item));
+
+  /* ---------- Demo auth (no backend yet — swap for real auth on request) ---------- */
+  const DEMO_USER = 'admin';
+  const DEMO_PASS = 'pass';
+
+  const overlay = document.getElementById('auth-overlay');
+  const authForm = document.getElementById('auth-form');
+  const authError = document.getElementById('auth-error');
+  const authEmailInput = document.getElementById('auth-email');
+  const authPasswordInput = document.getElementById('auth-password');
+  const navAuthArea = document.getElementById('nav-auth-area');
+  const dashboardView = document.getElementById('dashboard-view');
+
+  function openAuth() {
+    console.log('[Prune] opening auth modal');
+    authError.classList.remove('show');
+    authForm.reset();
+    overlay.classList.add('show');
+  }
+  function closeAuth() { overlay.classList.remove('show'); }
+
+  document.querySelectorAll('.js-auth-open').forEach(el => el.addEventListener('click', e => { e.preventDefault(); openAuth(); }));
+  document.getElementById('auth-close').addEventListener('click', closeAuth);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeAuth(); });
+  document.getElementById('auth-fill-demo').addEventListener('click', () => {
+    authEmailInput.value = DEMO_USER;
+    authPasswordInput.value = DEMO_PASS;
+  });
+
+  function bindSignInButton() {
+    const btn = document.getElementById('nav-signin-btn');
+    if (btn) btn.addEventListener('click', openAuth);
+  }
+  bindSignInButton();
+
+  function attemptLogin(e) {
+    if (e) e.preventDefault();
+    const u = authEmailInput.value.trim().toLowerCase();
+    const p = authPasswordInput.value;
+    console.log('[Prune] login attempt:', u);
+    if (u === DEMO_USER && p === DEMO_PASS) {
+      console.log('[Prune] credentials matched — entering dashboard');
+      closeAuth();
+      enterDashboard();
+    } else {
+      console.log('[Prune] credentials did not match');
+      authError.textContent = 'Incorrect demo credentials — try admin / pass.';
+      authError.classList.add('show');
+    }
+  }
+
+  authForm.addEventListener('submit', attemptLogin);
+  // Belt-and-suspenders: also bind directly to the button click in case the
+  // form's submit event doesn't fire in some embedded/preview contexts.
+  document.getElementById('auth-submit-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    attemptLogin(e);
+  });
+
+  function enterDashboard() {
+    document.body.classList.add('in-dashboard');
+    navAuthArea.innerHTML =
+      '<div class="auth-loggedin"><span class="email-tag">admin (demo)</span>' +
+      '<button class="btn ghost" id="nav-signout-btn" style="padding:8px 14px;font-size:12px;">Sign out</button></div>';
+    document.getElementById('nav-signout-btn').addEventListener('click', exitDashboard);
+    window.scrollTo(0, 0);
+    renderSubscriptions();
+    renderActivity();
+  }
+
+  function exitDashboard() {
+    document.body.classList.remove('in-dashboard');
+    navAuthArea.innerHTML = '<button class="btn ghost" id="nav-signin-btn" style="padding:8px 16px;font-size:12px;">Sign in</button>';
+    bindSignInButton();
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Dashboard tabs ---------- */
+  document.querySelectorAll('.dash-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ---------- Dashboard state ---------- */
+  let subs = [
+    { id: 1, name: 'ChatGPT Team', price: 30, note: 'used by 6/6 seats, daily', status: 'keep' },
+    { id: 2, name: 'Notion AI', price: 20, note: 'unused 34 days · 1 seat active', status: 'cut' },
+    { id: 3, name: 'Midjourney', price: 30, note: 'used by design team, daily', status: 'keep' },
+    { id: 4, name: 'Jasper', price: 49, note: 'unused 61 days', status: 'cut' },
+    { id: 5, name: 'Copy.ai', price: 36, note: 'overlaps ChatGPT, barely used', status: 'cut' }
+  ];
+  let nextId = 6;
+  let activity = [];
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  }
+
+  function logActivity(text) {
+    activity.unshift({ text: text });
+    activity = activity.slice(0, 8);
+    renderActivity();
+  }
+
+  function renderActivity() {
+    const el = document.getElementById('activity-feed');
+    if (!el) return;
+    if (activity.length === 0) {
+      el.innerHTML = '<div class="activity-item"><span>No activity yet — cut or add a subscription to see it logged here.</span></div>';
+      return;
+    }
+    el.innerHTML = activity.map(a =>
+      '<div class="activity-item"><span class="a-tag">' + escapeHtml(a.text) + '</span></div>'
+    ).join('');
+  }
+
+  function renderStats() {
+    const total = subs.reduce((s, x) => s + x.price, 0);
+    const waste = subs.filter(x => x.status === 'cut').reduce((s, x) => s + x.price, 0);
+    document.getElementById('stat-total').textContent = '$' + total.toLocaleString();
+    document.getElementById('stat-waste').textContent = '$' + waste.toLocaleString();
+    document.getElementById('stat-tools').textContent = subs.length;
+    document.getElementById('stat-annual').textContent = '$' + (waste * 12).toLocaleString();
+  }
+
+  function renderSubscriptions() {
+    const list = document.getElementById('sub-list');
+    if (!list) return;
+    if (subs.length === 0) {
+      list.innerHTML = '<div class="activity-item"><span>No subscriptions tracked — add one above.</span></div>';
+      renderStats();
+      return;
+    }
+    list.innerHTML = subs.map(s => `
+      <div class="sub-row ${s.status}" data-id="${s.id}">
+        <span class="laser"></span>
+        <div class="sub-main">
+          <span class="sub-name">${escapeHtml(s.name)}</span>
+          <span class="sub-note">${escapeHtml(s.note)}</span>
+        </div>
+        <span class="sub-price">$${s.price}/mo</span>
+        <span class="badge ${s.status}">${s.status === 'cut' ? 'Cut' : 'Keep'}</span>
+        <div class="row-actions">
+          <button class="toggle-btn" data-id="${s.id}">${s.status === 'cut' ? 'Keep instead' : 'Cut this'}</button>
+          <button class="danger delete-btn" data-id="${s.id}">Remove</button>
+        </div>
+      </div>
+    `).join('');
+    renderStats();
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => toggleStatus(parseInt(btn.dataset.id, 10)));
+    });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => deleteSub(parseInt(btn.dataset.id, 10)));
+    });
+  }
+
+  function toggleStatus(id) {
+    const s = subs.find(x => x.id === id);
+    if (!s) return;
+    s.status = s.status === 'cut' ? 'keep' : 'cut';
+    renderSubscriptions();
+    if (s.status === 'cut') {
+      const row = document.querySelector('.sub-row[data-id="' + id + '"]');
+      if (row) burstSparks(row);
+      logActivity('✂ Cut — ' + s.name + ' ($' + s.price + '/mo)');
+    } else {
+      logActivity('✓ Kept — ' + s.name);
+    }
+  }
+
+  function deleteSub(id) {
+    const s = subs.find(x => x.id === id);
+    subs = subs.filter(x => x.id !== id);
+    renderSubscriptions();
+    if (s) logActivity('Removed — ' + s.name);
+  }
+
+  const addForm = document.getElementById('add-sub-form');
+  const showAddBtn = document.getElementById('show-add-form');
+  showAddBtn.addEventListener('click', () => addForm.classList.toggle('show'));
+  document.getElementById('cancel-add-form').addEventListener('click', () => {
+    addForm.reset();
+    addForm.classList.remove('show');
+  });
+
+  addForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('add-name').value.trim();
+    const price = parseFloat(document.getElementById('add-price').value);
+    const usage = document.getElementById('add-usage').value;
+    if (!name || isNaN(price)) return;
+
+    const suggestedCut = (usage === 'Unused 30+ days' || usage === 'Never used');
+    const newSub = { id: nextId++, name: name, price: price, note: usage, status: suggestedCut ? 'cut' : 'keep' };
+    subs.push(newSub);
+    renderSubscriptions();
+    addForm.reset();
+    addForm.classList.remove('show');
+    logActivity('+ Added — ' + name + (suggestedCut ? ' (flagged for cut)' : ''));
+
+    if (suggestedCut) {
+      setTimeout(() => {
+        const row = document.querySelector('.sub-row[data-id="' + newSub.id + '"]');
+        if (row) burstSparks(row);
+      }, 150);
+    }
+  });
+
+  /* ---------- Settings toggles (visual state only) ---------- */
+  document.querySelectorAll('[data-toggle]').forEach(sw => {
+    sw.addEventListener('click', () => sw.classList.toggle('on'));
+  });
+</script>
+
+</body>
+</html>
