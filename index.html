@@ -39,6 +39,83 @@
     pointer-events: none;
   }
 
+  /* PRELOADER */
+  #preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--void);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #preloader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+  #flow-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .preloader-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  .preloader-mark {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    margin-bottom: 28px;
+    opacity: 0.9;
+  }
+  .preloader-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(48px, 10vw, 96px);
+    font-weight: 500;
+    color: var(--ice);
+    letter-spacing: -0.02em;
+    margin-bottom: 22px;
+  }
+  .preloader-bar {
+    width: 220px;
+    height: 2px;
+    background: var(--line);
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .preloader-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--ember), var(--violet));
+  }
+  .preloader-skip {
+    position: absolute;
+    bottom: 28px; right: 28px;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--smoke);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .preloader-skip:hover { color: var(--ice); border-color: var(--ice); }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s cubic-bezier(.2,.7,.3,1), transform 0.9s cubic-bezier(.2,.7,.3,1);
+  }
+  .reveal.revealed { opacity: 1; transform: translateY(0); }
+  .reveal-1 { transition-delay: 0.08s; }
+  .reveal-2 { transition-delay: 0.16s; }
+  .reveal-3 { transition-delay: 0.24s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    #preloader { display: none; }
+  }
+
   .content { position: relative; z-index: 1; }
 
   .wrap {
@@ -1327,6 +1404,16 @@
 </head>
 <body>
 
+<div id="preloader">
+  <canvas id="flow-canvas"></canvas>
+  <div class="preloader-inner">
+    <div class="preloader-mark">✂ Prune</div>
+    <div class="preloader-pct" id="preloader-pct">0%</div>
+    <div class="preloader-bar"><div class="preloader-bar-fill" id="preloader-bar-fill"></div></div>
+  </div>
+  <button class="preloader-skip" id="preloader-skip">Skip</button>
+</div>
+
 <canvas id="field"></canvas>
 
 <div id="debug-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:#a8341f; color:#fff; font-family:'JetBrains Mono',monospace; font-size:12px; padding:12px 16px; z-index:9999; white-space:pre-wrap; line-height:1.5;"></div>
@@ -1354,18 +1441,18 @@
   <div class="wrap" id="marketing-wrap">
 
     <section class="hero">
-      <div class="eyebrow"><span class="dot"></span>Your team is bleeding money right now</div>
-      <h1 class="headline">
+      <div class="eyebrow reveal"><span class="dot"></span>Your team is bleeding money right now</div>
+      <h1 class="headline reveal reveal-1">
         Stop paying for<br>
         AI tools you <span class="glitch-word" data-text="never">never</span> touch.
       </h1>
-      <p class="sub">Prune watches every AI subscription your team pays for, tracks who's actually using what, and hands you a one-click cut list every month. No dashboard to babysit. Just the truth, itemized.</p>
+      <p class="sub reveal reveal-2">Prune watches every AI subscription your team pays for, tracks who's actually using what, and hands you a one-click cut list every month. No dashboard to babysit. Just the truth, itemized.</p>
 
-      <div class="cta-row">
+      <div class="cta-row reveal reveal-3">
         <a href="#" class="btn primary js-auth-open">Join the waitlist</a>
         <button class="btn ghost" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">See it cut something ↓</button>
       </div>
-      <p class="cta-note">Takes 10 seconds. No card, no spam.</p>
+      <p class="cta-note reveal reveal-3">Takes 10 seconds. No card, no spam.</p>
 
       <div class="scroll-cue"><div class="bar"></div>SCROLL</div>
     </section>
@@ -1419,26 +1506,26 @@
     </section>
 
     <section>
-      <div class="section-label">The problem</div>
-      <h2>Nobody signed up to be an AI subscription accountant.</h2>
-      <p class="problem-text">Most teams now run <strong>three to seven overlapping AI tools</strong> — picked up one at a time, by different people, for good reasons in the moment. Nobody's job is to notice when a $30/mo tool goes untouched for two months, or when two tools quietly do the exact same thing. So it just sits on the card, month after month, until someone finally asks why.</p>
+      <div class="section-label reveal">The problem</div>
+      <h2 class="reveal reveal-1">Nobody signed up to be an AI subscription accountant.</h2>
+      <p class="problem-text reveal reveal-2">Most teams now run <strong>three to seven overlapping AI tools</strong> — picked up one at a time, by different people, for good reasons in the moment. Nobody's job is to notice when a $30/mo tool goes untouched for two months, or when two tools quietly do the exact same thing. So it just sits on the card, month after month, until someone finally asks why.</p>
     </section>
 
     <section>
-      <div class="section-label">How it works</div>
-      <h2>Three steps. No new habits.</h2>
+      <div class="section-label reveal">How it works</div>
+      <h2 class="reveal reveal-1">Three steps. No new habits.</h2>
       <div class="steps">
-        <div class="step">
+        <div class="step reveal reveal-1">
           <span class="num">01 / CONNECT</span>
           <h3>Link your billing</h3>
           <p>Forward receipts or connect your card statement. Two minutes, zero engineering.</p>
         </div>
-        <div class="step">
+        <div class="step reveal reveal-2">
           <span class="num">02 / TRACK</span>
           <h3>We watch real usage</h3>
           <p>Prune checks login and activity signals against what you're paying for, quietly.</p>
         </div>
-        <div class="step">
+        <div class="step reveal reveal-3">
           <span class="num">03 / CUT</span>
           <h3>Get your monthly report</h3>
           <p>One email. What's earning its keep, what's not, and a one-click cancel link.</p>
@@ -1447,9 +1534,9 @@
     </section>
 
     <section>
-      <div class="section-label">Pricing</div>
-      <h2>One plan. No tiers to game.</h2>
-      <div class="pricing-box">
+      <div class="section-label reveal">Pricing</div>
+      <h2 class="reveal reveal-1">One plan. No tiers to game.</h2>
+      <div class="pricing-box reveal reveal-2">
         <div class="price-fig">$29<span>/month, per workspace</span></div>
         <p class="price-detail">Unlimited seats and tools tracked. Cancel anytime — most teams save more than they pay us in month one.</p>
         <div style="margin-top: 22px; position: relative;">
@@ -1746,6 +1833,89 @@
       b.textContent = 'Something broke: ' + e.message + '  (line ' + e.lineno + ')';
     }
   });
+  /* ---------- Preloader: flowing gradient + percentage counter ---------- */
+  (function () {
+    const pre = document.getElementById('preloader');
+    const flowCanvas = document.getElementById('flow-canvas');
+    const fctx = flowCanvas.getContext('2d');
+    const pctEl = document.getElementById('preloader-pct');
+    const barFill = document.getElementById('preloader-bar-fill');
+    const reduceMotionPre = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let fw, fh, t = 0;
+
+    function resizeFlow() {
+      fw = flowCanvas.width = window.innerWidth;
+      fh = flowCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeFlow);
+    resizeFlow();
+
+    const streamCount = 26;
+    const streams = Array.from({ length: streamCount }, (_, i) => ({
+      offset: (i / streamCount) * Math.PI * 2,
+      speed: 0.4 + Math.random() * 0.4,
+      amp: 40 + Math.random() * 80,
+      hue: i % 2 === 0 ? 'rgba(255,68,38,' : 'rgba(139,92,246,'
+    }));
+
+    function drawFlow() {
+      fctx.clearRect(0, 0, fw, fh);
+      t += 0.006;
+      streams.forEach((s, i) => {
+        const yBase = (fh / streamCount) * i;
+        fctx.beginPath();
+        for (let x = 0; x <= fw; x += 12) {
+          const y = yBase + Math.sin(x * 0.004 + t * s.speed * 6 + s.offset) * s.amp * Math.sin(t * 0.3 + i);
+          if (x === 0) fctx.moveTo(x, y); else fctx.lineTo(x, y);
+        }
+        fctx.strokeStyle = s.hue + '0.08)';
+        fctx.lineWidth = 1.4;
+        fctx.stroke();
+      });
+      if (!pre.classList.contains('done')) requestAnimationFrame(drawFlow);
+    }
+    drawFlow();
+
+    let pct = 0;
+    function finishLoad() {
+      pre.classList.add('done');
+      document.body.style.overflow = '';
+      setTimeout(() => { if (pre.parentNode) pre.remove(); }, 900);
+    }
+    document.getElementById('preloader-skip').addEventListener('click', finishLoad);
+
+    if (reduceMotionPre) {
+      finishLoad();
+    } else {
+      document.body.style.overflow = 'hidden';
+      const tick = setInterval(() => {
+        pct += Math.random() * 9 + 3;
+        if (pct >= 100) {
+          pct = 100;
+          clearInterval(tick);
+          setTimeout(finishLoad, 350);
+        }
+        pctEl.textContent = Math.floor(pct) + '%';
+        barFill.style.width = pct + '%';
+      }, 120);
+    }
+  })();
+
+  /* ---------- Scroll reveal ---------- */
+  (function () {
+    const revealEls = document.querySelectorAll('.reveal');
+    if (revealEls.length === 0) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+  })();
+
   /* ---------- Ember particle field ---------- */
   const canvas = document.getElementById('field');
   const ctx = canvas.getContext('2d');
