@@ -794,6 +794,126 @@
     .sub-row .badge { grid-column: 1/-1; }
     .sub-row .row-actions { grid-column: 1/-1; }
   }
+
+  /* CHART */
+  .chart-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--smoke);
+    margin-left: 12px;
+  }
+  .chart-card {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px 20px 10px;
+    margin-bottom: 36px;
+  }
+  .chart-card svg { width: 100%; height: 180px; display: block; }
+
+  /* SEARCH / FILTER / SORT */
+  .sub-controls {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .sub-search-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--void-2);
+    color: var(--ice);
+    flex: 1;
+    min-width: 180px;
+  }
+  .sub-search-input:focus { outline: none; border-color: var(--acid); }
+  .filter-chips { display: flex; gap: 6px; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: none;
+    color: var(--smoke);
+    cursor: pointer;
+  }
+  .chip:hover { color: var(--ice); }
+  .chip.active { color: var(--void); background: var(--ice); border-color: var(--ice); }
+  .sub-sort-select {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--void-2);
+    color: var(--ice);
+  }
+
+  /* BILLING */
+  .plan-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .plan-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--violet);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .plan-price {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .plan-price span { font-size: 13px; font-family: 'JetBrains Mono', monospace; color: var(--smoke); font-weight: 400; }
+  .invoice-list { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .invoice-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--smoke);
+  }
+  .invoice-row:last-child { border-bottom: none; }
+  .invoice-row .inv-amount { color: var(--ice); }
+  .invoice-row .inv-status {
+    color: var(--acid);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* TOASTS */
+  .toast {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--acid);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ice);
+    box-shadow: 0 10px 30px -8px rgba(0,0,0,0.6);
+    max-width: 280px;
+    animation: toast-in 0.25s ease;
+  }
+  .toast.ember { border-left-color: var(--ember); }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
     .steps { grid-template-columns: 1fr; }
     .line-item { grid-template-columns: 1fr auto; }
     .li-price { grid-row: 1; }
@@ -809,6 +929,8 @@
 <canvas id="field"></canvas>
 
 <div id="debug-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:#a8341f; color:#fff; font-family:'JetBrains Mono',monospace; font-size:12px; padding:12px 16px; z-index:9999; white-space:pre-wrap; line-height:1.5;"></div>
+
+<div id="toast-container" style="position:fixed; bottom:24px; right:24px; z-index:500; display:flex; flex-direction:column; gap:10px;"></div>
 
 <div class="content">
 
@@ -980,6 +1102,8 @@
     <div class="dash-tabs">
       <button class="dash-tab active" data-tab="overview">Overview</button>
       <button class="dash-tab" data-tab="subs">Subscriptions</button>
+      <button class="dash-tab" data-tab="team">Team</button>
+      <button class="dash-tab" data-tab="billing">Billing</button>
       <button class="dash-tab" data-tab="settings">Settings</button>
     </div>
 
@@ -990,6 +1114,12 @@
         <div class="stat-card"><div class="stat-label">Tools tracked</div><div class="stat-value" id="stat-tools">0</div></div>
         <div class="stat-card acid"><div class="stat-label">Annual savings if cut</div><div class="stat-value" id="stat-annual">$0</div></div>
       </div>
+
+      <div class="dash-section-head"><h3>Spend trend</h3><span class="chart-note">illustrative — connects to real history once billing is linked</span></div>
+      <div class="chart-card">
+        <svg id="trend-chart" viewBox="0 0 640 200" preserveAspectRatio="none"></svg>
+      </div>
+
       <div class="dash-section-head"><h3>Recent activity</h3></div>
       <div class="activity-feed" id="activity-feed"></div>
     </div>
@@ -997,8 +1127,27 @@
     <div class="dash-panel" id="panel-subs">
       <div class="dash-section-head">
         <h3>All subscriptions</h3>
-        <button class="btn ghost" id="show-add-form" style="padding:10px 16px;font-size:13px;">+ Add subscription</button>
+        <div style="display:flex; gap:10px;">
+          <button class="btn ghost" id="export-csv" style="padding:10px 16px;font-size:13px;">Export CSV</button>
+          <button class="btn ghost" id="show-add-form" style="padding:10px 16px;font-size:13px;">+ Add subscription</button>
+        </div>
       </div>
+
+      <div class="sub-controls">
+        <input type="text" id="sub-search" placeholder="Search subscriptions…" class="sub-search-input">
+        <div class="filter-chips" id="filter-chips">
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="keep">Keep</button>
+          <button class="chip" data-filter="cut">Cut</button>
+        </div>
+        <select id="sub-sort" class="sub-sort-select">
+          <option value="default">Sort: default</option>
+          <option value="price-desc">Price: high to low</option>
+          <option value="price-asc">Price: low to high</option>
+          <option value="name-asc">Name: A–Z</option>
+        </select>
+      </div>
+
       <div class="terminal">
         <div class="terminal-bar">
           <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
@@ -1018,6 +1167,64 @@
           <button type="button" class="btn ghost" id="cancel-add-form" style="padding:9px 14px;font-size:12px;">Cancel</button>
         </form>
         <div id="sub-list"></div>
+      </div>
+    </div>
+
+    <div class="dash-panel" id="panel-team">
+      <div class="dash-section-head">
+        <h3>Team members</h3>
+        <button class="btn ghost" id="show-invite-form" style="padding:10px 16px;font-size:13px;">+ Invite member</button>
+      </div>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
+          <span class="path">prune — team — acme-studio.workspace</span>
+        </div>
+        <form class="add-row-form" id="invite-form" style="grid-template-columns: 1.5fr 2fr 1fr auto auto;">
+          <input type="text" id="invite-name" placeholder="Name" required>
+          <input type="email" id="invite-email" placeholder="Email" required>
+          <select id="invite-role">
+            <option>Member</option>
+            <option>Admin</option>
+            <option>Viewer</option>
+          </select>
+          <button type="submit" class="btn primary" style="padding:9px 14px;font-size:12px;">Invite</button>
+          <button type="button" class="btn ghost" id="cancel-invite-form" style="padding:9px 14px;font-size:12px;">Cancel</button>
+        </form>
+        <div id="team-list"></div>
+      </div>
+    </div>
+
+    <div class="dash-panel" id="panel-billing">
+      <div class="dash-section-head"><h3>Billing</h3></div>
+
+      <div class="settings-block">
+        <h4>Current plan</h4>
+        <div class="plan-card">
+          <div>
+            <div class="plan-name">Founding cohort</div>
+            <div class="plan-price">$29<span>/month, per workspace</span></div>
+          </div>
+          <button class="btn ghost" disabled title="Real billing coming soon" style="opacity:0.45;cursor:not-allowed;">Change plan</button>
+        </div>
+      </div>
+
+      <div class="settings-block">
+        <h4>Payment method</h4>
+        <div class="settings-row">
+          <span class="s-label">Card on file</span>
+          <span>•••• •••• •••• 4242 (demo)</span>
+        </div>
+        <div class="settings-row">
+          <span class="s-label">Billing email</span>
+          <span>admin@acmestudio.demo</span>
+        </div>
+        <button class="btn ghost" disabled title="Real billing coming soon" style="opacity:0.45;cursor:not-allowed;margin-top:14px;">Update payment method</button>
+      </div>
+
+      <div class="settings-block">
+        <h4>Invoice history</h4>
+        <div class="invoice-list" id="invoice-list"></div>
       </div>
     </div>
 
@@ -1232,6 +1439,10 @@
     window.scrollTo(0, 0);
     renderSubscriptions();
     renderActivity();
+    renderChart();
+    renderTeam();
+    renderInvoices();
+    toast('Welcome back, admin.');
   }
 
   function exitDashboard() {
@@ -1261,9 +1472,27 @@
   ];
   let nextId = 6;
   let activity = [];
+  let searchQuery = '';
+  let filterStatus = 'all';
+  let sortMode = 'default';
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  }
+
+  /* ---------- Toasts ---------- */
+  function toast(msg, tone) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const el = document.createElement('div');
+    el.className = 'toast' + (tone === 'ember' ? ' ember' : '');
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.transition = 'opacity 0.3s ease';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 300);
+    }, 2800);
   }
 
   function logActivity(text) {
@@ -1291,17 +1520,142 @@
     document.getElementById('stat-waste').textContent = '$' + waste.toLocaleString();
     document.getElementById('stat-tools').textContent = subs.length;
     document.getElementById('stat-annual').textContent = '$' + (waste * 12).toLocaleString();
+    renderChart();
+  }
+
+  /* ---------- Spend trend chart (illustrative, derived from live totals) ---------- */
+  function renderChart() {
+    const svg = document.getElementById('trend-chart');
+    if (!svg) return;
+    const currentTotal = subs.reduce((s, x) => s + x.price, 0);
+    const currentWaste = subs.filter(x => x.status === 'cut').reduce((s, x) => s + x.price, 0);
+    // Six mock months trending toward the current live numbers, so it feels connected to real state.
+    const months = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+    const spend = [0.7, 0.78, 0.85, 0.92, 0.97, 1].map(f => Math.round(currentTotal * f));
+    const waste = [0.3, 0.45, 0.55, 0.7, 0.85, 1].map(f => Math.round(currentWaste * f));
+    const maxVal = Math.max(...spend, 1);
+    const w = 640, h = 180, pad = 24;
+    const xStep = (w - pad * 2) / (months.length - 1);
+    const toY = v => h - pad - ((v / maxVal) * (h - pad * 2));
+    const pathFor = arr => arr.map((v, i) => (i === 0 ? 'M' : 'L') + (pad + i * xStep) + ',' + toY(v)).join(' ');
+
+    let svgContent = '';
+    // gridlines
+    for (let i = 0; i <= 3; i++) {
+      const y = pad + (i * (h - pad * 2) / 3);
+      svgContent += `<line x1="${pad}" y1="${y}" x2="${w - pad}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;
+    }
+    // spend area
+    const spendPath = pathFor(spend);
+    svgContent += `<path d="${spendPath} L${w - pad},${h - pad} L${pad},${h - pad} Z" fill="rgba(139,92,246,0.12)" stroke="none"/>`;
+    svgContent += `<path d="${spendPath}" fill="none" stroke="var(--violet)" stroke-width="2"/>`;
+    // waste line
+    svgContent += `<path d="${pathFor(waste)}" fill="none" stroke="var(--ember)" stroke-width="2" stroke-dasharray="4 3"/>`;
+    // dots + month labels
+    months.forEach((m, i) => {
+      const x = pad + i * xStep;
+      svgContent += `<circle cx="${x}" cy="${toY(spend[i])}" r="3" fill="var(--violet)"/>`;
+      svgContent += `<circle cx="${x}" cy="${toY(waste[i])}" r="3" fill="var(--ember)"/>`;
+      svgContent += `<text x="${x}" y="${h - 4}" fill="var(--smoke)" font-size="10" font-family="JetBrains Mono, monospace" text-anchor="middle">${m}</text>`;
+    });
+    svg.innerHTML = svgContent;
+  }
+
+  /* ---------- Team ---------- */
+  let team = [
+    { id: 1, name: 'Admin (you)', email: 'admin@acmestudio.demo', role: 'Admin' },
+    { id: 2, name: 'Sam Rivera', email: 'sam@acmestudio.demo', role: 'Member' },
+    { id: 3, name: 'Jo Ling', email: 'jo@acmestudio.demo', role: 'Viewer' }
+  ];
+  let nextTeamId = 4;
+
+  function renderTeam() {
+    const el = document.getElementById('team-list');
+    if (!el) return;
+    el.innerHTML = team.map(m => `
+      <div class="sub-row" data-team-id="${m.id}">
+        <div class="sub-main">
+          <span class="sub-name">${escapeHtml(m.name)}</span>
+          <span class="sub-note">${escapeHtml(m.email)}</span>
+        </div>
+        <span class="badge keep">${escapeHtml(m.role)}</span>
+        <span></span>
+        <div class="row-actions">
+          <button class="danger team-remove-btn" data-id="${m.id}">Remove</button>
+        </div>
+      </div>
+    `).join('');
+    document.querySelectorAll('.team-remove-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = team.find(x => x.id === parseInt(btn.dataset.id, 10));
+        team = team.filter(x => x.id !== parseInt(btn.dataset.id, 10));
+        renderTeam();
+        if (m) { logActivity('Removed team member — ' + m.name); toast(m.name + ' removed from team.', 'ember'); }
+      });
+    });
+  }
+
+  const inviteForm = document.getElementById('invite-form');
+  document.getElementById('show-invite-form').addEventListener('click', () => inviteForm.classList.toggle('show'));
+  document.getElementById('cancel-invite-form').addEventListener('click', () => {
+    inviteForm.reset();
+    inviteForm.classList.remove('show');
+  });
+  inviteForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('invite-name').value.trim();
+    const email = document.getElementById('invite-email').value.trim();
+    const role = document.getElementById('invite-role').value;
+    if (!name || !email) return;
+    team.push({ id: nextTeamId++, name, email, role });
+    renderTeam();
+    inviteForm.reset();
+    inviteForm.classList.remove('show');
+    logActivity('Invited ' + name + ' as ' + role);
+    toast(name + ' invited as ' + role + '.');
+  });
+
+  /* ---------- Billing: mock invoice history ---------- */
+  function renderInvoices() {
+    const el = document.getElementById('invoice-list');
+    if (!el) return;
+    const invoices = [
+      { date: 'Jun 1, 2026', amount: '$29.00', status: 'Paid (demo)' },
+      { date: 'May 1, 2026', amount: '$29.00', status: 'Paid (demo)' },
+      { date: 'Apr 1, 2026', amount: '$29.00', status: 'Paid (demo)' }
+    ];
+    el.innerHTML = invoices.map(inv =>
+      `<div class="invoice-row"><span>${inv.date}</span><span class="inv-amount">${inv.amount}</span><span class="inv-status">${inv.status}</span></div>`
+    ).join('');
+  }
+
+  function getFilteredSubs() {
+    let result = subs.filter(s => {
+      const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesFilter = filterStatus === 'all' || s.status === filterStatus;
+      return matchesSearch && matchesFilter;
+    });
+    if (sortMode === 'price-desc') result = result.slice().sort((a, b) => b.price - a.price);
+    if (sortMode === 'price-asc') result = result.slice().sort((a, b) => a.price - b.price);
+    if (sortMode === 'name-asc') result = result.slice().sort((a, b) => a.name.localeCompare(b.name));
+    return result;
   }
 
   function renderSubscriptions() {
     const list = document.getElementById('sub-list');
     if (!list) return;
+    const filtered = getFilteredSubs();
     if (subs.length === 0) {
       list.innerHTML = '<div class="activity-item"><span>No subscriptions tracked — add one above.</span></div>';
       renderStats();
       return;
     }
-    list.innerHTML = subs.map(s => `
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="activity-item"><span>Nothing matches that search or filter.</span></div>';
+      renderStats();
+      return;
+    }
+    list.innerHTML = filtered.map(s => `
       <div class="sub-row ${s.status}" data-id="${s.id}">
         <span class="laser"></span>
         <div class="sub-main">
@@ -1325,6 +1679,40 @@
     });
   }
 
+  document.getElementById('sub-search').addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    renderSubscriptions();
+  });
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      filterStatus = chip.dataset.filter;
+      renderSubscriptions();
+    });
+  });
+  document.getElementById('sub-sort').addEventListener('change', (e) => {
+    sortMode = e.target.value;
+    renderSubscriptions();
+  });
+
+  document.getElementById('export-csv').addEventListener('click', () => {
+    const header = 'Name,Price/mo,Status,Note\n';
+    const rows = subs.map(s =>
+      [s.name, s.price, s.status, s.note].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')
+    ).join('\n');
+    const blob = new Blob([header + rows], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'prune-subscriptions.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast('CSV exported — check your downloads.');
+  });
+
   function toggleStatus(id) {
     const s = subs.find(x => x.id === id);
     if (!s) return;
@@ -1334,8 +1722,10 @@
       const row = document.querySelector('.sub-row[data-id="' + id + '"]');
       if (row) burstSparks(row);
       logActivity('✂ Cut — ' + s.name + ' ($' + s.price + '/mo)');
+      toast(s.name + ' cut — saving $' + s.price + '/mo.', 'ember');
     } else {
       logActivity('✓ Kept — ' + s.name);
+      toast(s.name + ' kept.');
     }
   }
 
@@ -1343,7 +1733,10 @@
     const s = subs.find(x => x.id === id);
     subs = subs.filter(x => x.id !== id);
     renderSubscriptions();
-    if (s) logActivity('Removed — ' + s.name);
+    if (s) {
+      logActivity('Removed — ' + s.name);
+      toast(s.name + ' removed.', 'ember');
+    }
   }
 
   const addForm = document.getElementById('add-sub-form');
@@ -1368,6 +1761,7 @@
     addForm.reset();
     addForm.classList.remove('show');
     logActivity('+ Added — ' + name + (suggestedCut ? ' (flagged for cut)' : ''));
+    toast('Added ' + name + (suggestedCut ? ' — flagged as waste.' : '.'), suggestedCut ? 'ember' : undefined);
 
     if (suggestedCut) {
       setTimeout(() => {
@@ -1385,4 +1779,3 @@
 
 </body>
 </html>
-<!-- redeploy trigger: 2026-07-01T10:50:02Z -->
