@@ -577,6 +577,7 @@
 
   /* DASHBOARD */
   body.in-dashboard #marketing-wrap { display: none; }
+  body.in-dashboard nav { display: none; }
   #dashboard-view { display: none; min-height: 100vh; }
   body.in-dashboard #dashboard-view { display: block; }
 
@@ -689,7 +690,7 @@
   .sub-row {
     position: relative;
     display: grid;
-    grid-template-columns: 2fr auto auto auto;
+    grid-template-columns: 2fr auto auto auto auto;
     gap: 16px;
     align-items: center;
     padding: 16px 20px;
@@ -792,7 +793,10 @@
     .add-row-form { grid-template-columns: 1fr; }
     .sub-row { grid-template-columns: 1fr auto; }
     .sub-row .badge { grid-column: 1/-1; }
+    .sub-row .cat-tag { grid-column: 1/-1; }
     .sub-row .row-actions { grid-column: 1/-1; }
+    .topbar-right { gap: 8px; }
+    .cmdk-trigger span:first-child { display: none; }
   }
 
   /* CHART */
@@ -914,6 +918,261 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  .toast-undo {
+    background: none;
+    border: 1px solid var(--acid);
+    color: var(--acid);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* TOPBAR RIGHT CLUSTER */
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .cmdk-trigger {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--smoke);
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  .cmdk-trigger:hover { border-color: var(--acid); color: var(--ice); }
+  .cmdk-kbd {
+    font-size: 10px;
+    background: var(--void-3);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 2px 6px;
+  }
+  .icon-btn {
+    position: relative;
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    width: 36px; height: 36px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn:hover { border-color: var(--acid); }
+  .bell-badge {
+    position: absolute;
+    top: -5px; right: -5px;
+    background: var(--ember);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    min-width: 15px; height: 15px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 3px;
+  }
+  .bell-wrap, .avatar-wrap { position: relative; }
+  .bell-dropdown, .avatar-dropdown {
+    display: none;
+    position: absolute;
+    top: 44px; right: 0;
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    min-width: 240px;
+    z-index: 50;
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  .bell-dropdown.show, .avatar-dropdown.show { display: block; }
+  .bell-dropdown .activity-item { background: var(--void-2); }
+  .avatar-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--ice);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 12px 16px;
+    cursor: pointer;
+  }
+  .avatar-dropdown button:hover { background: var(--void-3); }
+  .avatar-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ember);
+    color: var(--void);
+    border: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* COMMAND PALETTE */
+  .cmdk-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(7,8,10,0.75);
+    backdrop-filter: blur(4px);
+    z-index: 300;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 12vh;
+  }
+  .cmdk-overlay.show { display: flex; }
+  .cmdk-box {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -12px rgba(0,0,0,0.7);
+  }
+  .cmdk-input {
+    width: 100%;
+    background: var(--void-3);
+    border: none;
+    border-bottom: 1px solid var(--line);
+    color: var(--ice);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    padding: 16px;
+  }
+  .cmdk-input:focus { outline: none; }
+  .cmdk-list { max-height: 320px; overflow-y: auto; }
+  .cmdk-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ice);
+    cursor: pointer;
+  }
+  .cmdk-item .cmdk-tag { color: var(--smoke); font-size: 11px; }
+  .cmdk-item:hover, .cmdk-item.selected { background: var(--void-3); }
+  .cmdk-empty { padding: 20px 16px; color: var(--smoke); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+  /* ONBOARDING CHECKLIST */
+  .onboard-card {
+    position: relative;
+    background: linear-gradient(140deg, var(--void-2), var(--void-3));
+    border: 1px solid var(--violet);
+    border-radius: 8px;
+    padding: 22px 24px;
+    margin-bottom: 28px;
+  }
+  .onboard-card h4 { font-family: 'Space Grotesk', sans-serif; margin: 0 0 14px; font-size: 15px; }
+  .onboard-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; color: var(--smoke);
+    cursor: pointer; font-size: 14px;
+  }
+  .onboard-close:hover { color: var(--ice); }
+  .onboard-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--smoke);
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .onboard-check {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: transparent;
+    flex-shrink: 0;
+  }
+  .onboard-item.done { color: var(--ice); text-decoration: line-through; text-decoration-color: var(--line); }
+  .onboard-item.done .onboard-check { background: var(--acid); border-color: var(--acid); color: var(--void); }
+
+  /* BUDGET BAR */
+  .budget-card {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 28px;
+  }
+  .budget-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--smoke);
+    margin-bottom: 12px;
+  }
+  .budget-head input {
+    width: 80px;
+    background: var(--void);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--ice);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 6px 8px;
+    text-align: right;
+  }
+  .budget-track {
+    height: 8px;
+    background: var(--void-3);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .budget-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--acid);
+    transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.3s ease;
+  }
+  .budget-fill.warn { background: #f5c518; }
+  .budget-fill.over { background: var(--ember); }
+  .budget-caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--smoke);
+    margin-top: 10px;
+  }
+
+  /* ROW + TAB ANIMATIONS */
+  .row-enter { animation: row-in 0.35s ease both; }
+  @keyframes row-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .dash-panel.active { animation: panel-in 0.3s ease; }
+  @keyframes panel-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .cat-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--violet);
+    border: 1px solid var(--violet);
+    border-radius: 12px;
+    padding: 3px 8px;
+    justify-self: start;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .row-enter, .dash-panel.active { animation: none !important; }
+  }
     .steps { grid-template-columns: 1fr; }
     .line-item { grid-template-columns: 1fr auto; }
     .li-price { grid-row: 1; }
@@ -931,6 +1190,13 @@
 <div id="debug-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:#a8341f; color:#fff; font-family:'JetBrains Mono',monospace; font-size:12px; padding:12px 16px; z-index:9999; white-space:pre-wrap; line-height:1.5;"></div>
 
 <div id="toast-container" style="position:fixed; bottom:24px; right:24px; z-index:500; display:flex; flex-direction:column; gap:10px;"></div>
+
+<div class="cmdk-overlay" id="cmdk-overlay">
+  <div class="cmdk-box">
+    <input type="text" id="cmdk-input" class="cmdk-input" placeholder="Type a command…" autocomplete="off">
+    <div class="cmdk-list" id="cmdk-list"></div>
+  </div>
+</div>
 
 <div class="content">
 
@@ -1094,7 +1360,24 @@
 <div id="dashboard-view">
   <div class="dash-topbar">
     <div class="brand"><span class="cut-mark">✂</span>Prune</div>
-    <div class="dash-workspace">Acme Studio · Demo workspace</div>
+    <div class="topbar-right">
+      <button class="cmdk-trigger" id="cmdk-trigger">
+        <span>Search or jump to…</span><span class="cmdk-kbd">⌘K</span>
+      </button>
+      <div class="bell-wrap">
+        <button class="icon-btn" id="bell-btn">
+          🔔<span class="bell-badge" id="bell-badge" style="display:none;">0</span>
+        </button>
+        <div class="bell-dropdown" id="bell-dropdown"></div>
+      </div>
+      <div class="avatar-wrap">
+        <button class="avatar-btn" id="avatar-btn">A</button>
+        <div class="avatar-dropdown" id="avatar-dropdown">
+          <button data-tab="settings">Settings</button>
+          <button id="avatar-signout">Sign out</button>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="dash-wrap">
     <div class="demo-badge-banner">⚠ Demo mode — this is sample data showing how Prune works. Nothing here is connected to real billing yet.</div>
@@ -1108,6 +1391,23 @@
     </div>
 
     <div class="dash-panel active" id="panel-overview">
+      <div class="onboard-card" id="onboard-card">
+        <button class="onboard-close" id="onboard-close">✕</button>
+        <h4>Get set up</h4>
+        <div class="onboard-item" id="onboard-add"><span class="onboard-check">✓</span> Add or review a subscription</div>
+        <div class="onboard-item" id="onboard-invite"><span class="onboard-check">✓</span> Invite a teammate</div>
+        <div class="onboard-item" id="onboard-export"><span class="onboard-check">✓</span> Export your first report</div>
+      </div>
+
+      <div class="budget-card">
+        <div class="budget-head">
+          <span>Monthly budget</span>
+          <input type="number" id="budget-input" value="150" min="0" step="10">
+        </div>
+        <div class="budget-track"><div class="budget-fill" id="budget-fill"></div></div>
+        <div class="budget-caption" id="budget-caption"></div>
+      </div>
+
       <div class="stat-grid">
         <div class="stat-card"><div class="stat-label">Monthly spend</div><div class="stat-value" id="stat-total">$0</div></div>
         <div class="stat-card ember"><div class="stat-label">Waste flagged</div><div class="stat-value" id="stat-waste">$0</div></div>
@@ -1146,6 +1446,14 @@
           <option value="price-asc">Price: low to high</option>
           <option value="name-asc">Name: A–Z</option>
         </select>
+        <select id="sub-category-filter" class="sub-sort-select">
+          <option value="all">Category: All</option>
+          <option value="Writing">Writing</option>
+          <option value="Design">Design</option>
+          <option value="Dev">Dev</option>
+          <option value="Productivity">Productivity</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
 
       <div class="terminal">
@@ -1153,7 +1461,7 @@
           <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
           <span class="path">prune — subscriptions — acme-studio.workspace</span>
         </div>
-        <form class="add-row-form" id="add-sub-form">
+        <form class="add-row-form" id="add-sub-form" style="grid-template-columns: 1.6fr 1fr 1.4fr 1fr auto auto;">
           <input type="text" id="add-name" placeholder="Tool name" required>
           <input type="number" id="add-price" placeholder="$/mo" min="0" step="0.01" required>
           <select id="add-usage">
@@ -1162,6 +1470,13 @@
             <option>Used this month</option>
             <option>Unused 30+ days</option>
             <option>Never used</option>
+          </select>
+          <select id="add-category">
+            <option>Writing</option>
+            <option>Design</option>
+            <option>Dev</option>
+            <option>Productivity</option>
+            <option>Other</option>
           </select>
           <button type="submit" class="btn primary" style="padding:9px 14px;font-size:12px;">Save</button>
           <button type="button" class="btn ghost" id="cancel-add-form" style="padding:9px 14px;font-size:12px;">Cancel</button>
@@ -1442,6 +1757,8 @@
     renderChart();
     renderTeam();
     renderInvoices();
+    renderOnboard();
+    renderBell();
     toast('Welcome back, admin.');
   }
 
@@ -1464,41 +1781,56 @@
 
   /* ---------- Dashboard state ---------- */
   let subs = [
-    { id: 1, name: 'ChatGPT Team', price: 30, note: 'used by 6/6 seats, daily', status: 'keep' },
-    { id: 2, name: 'Notion AI', price: 20, note: 'unused 34 days · 1 seat active', status: 'cut' },
-    { id: 3, name: 'Midjourney', price: 30, note: 'used by design team, daily', status: 'keep' },
-    { id: 4, name: 'Jasper', price: 49, note: 'unused 61 days', status: 'cut' },
-    { id: 5, name: 'Copy.ai', price: 36, note: 'overlaps ChatGPT, barely used', status: 'cut' }
+    { id: 1, name: 'ChatGPT Team', price: 30, note: 'used by 6/6 seats, daily', status: 'keep', category: 'Writing' },
+    { id: 2, name: 'Notion AI', price: 20, note: 'unused 34 days · 1 seat active', status: 'cut', category: 'Productivity' },
+    { id: 3, name: 'Midjourney', price: 30, note: 'used by design team, daily', status: 'keep', category: 'Design' },
+    { id: 4, name: 'Jasper', price: 49, note: 'unused 61 days', status: 'cut', category: 'Writing' },
+    { id: 5, name: 'Copy.ai', price: 36, note: 'overlaps ChatGPT, barely used', status: 'cut', category: 'Writing' }
   ];
   let nextId = 6;
   let activity = [];
   let searchQuery = '';
   let filterStatus = 'all';
+  let categoryFilter = 'all';
   let sortMode = 'default';
+  let unreadCount = 0;
+  let onboardState = { add: false, invite: false, export: false };
+  let monthlyBudget = 150;
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   }
 
-  /* ---------- Toasts ---------- */
-  function toast(msg, tone) {
+  /* ---------- Toasts (with optional undo action) ---------- */
+  function toast(msg, tone, undoFn) {
     const container = document.getElementById('toast-container');
     if (!container) return;
     const el = document.createElement('div');
     el.className = 'toast' + (tone === 'ember' ? ' ember' : '');
-    el.textContent = msg;
+    const label = document.createElement('div');
+    label.textContent = msg;
+    el.appendChild(label);
+    if (undoFn) {
+      const btn = document.createElement('button');
+      btn.className = 'toast-undo';
+      btn.textContent = 'Undo';
+      btn.addEventListener('click', () => { undoFn(); el.remove(); });
+      el.appendChild(btn);
+    }
     container.appendChild(el);
     setTimeout(() => {
       el.style.transition = 'opacity 0.3s ease';
       el.style.opacity = '0';
       setTimeout(() => el.remove(), 300);
-    }, 2800);
+    }, undoFn ? 5000 : 2800);
   }
 
   function logActivity(text) {
     activity.unshift({ text: text });
     activity = activity.slice(0, 8);
+    unreadCount++;
     renderActivity();
+    renderBell();
   }
 
   function renderActivity() {
@@ -1513,15 +1845,182 @@
     ).join('');
   }
 
+  /* ---------- Animated stat counters ---------- */
+  function animateValue(el, from, to, prefix) {
+    if (!el) return;
+    const duration = 500;
+    const start = performance.now();
+    function step(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(from + (to - from) * eased);
+      el.textContent = prefix + current.toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  let prevStats = { total: 0, waste: 0, annual: 0 };
+
   function renderStats() {
     const total = subs.reduce((s, x) => s + x.price, 0);
     const waste = subs.filter(x => x.status === 'cut').reduce((s, x) => s + x.price, 0);
-    document.getElementById('stat-total').textContent = '$' + total.toLocaleString();
-    document.getElementById('stat-waste').textContent = '$' + waste.toLocaleString();
+    const annual = waste * 12;
+    animateValue(document.getElementById('stat-total'), prevStats.total, total, '$');
+    animateValue(document.getElementById('stat-waste'), prevStats.waste, waste, '$');
+    animateValue(document.getElementById('stat-annual'), prevStats.annual, annual, '$');
     document.getElementById('stat-tools').textContent = subs.length;
-    document.getElementById('stat-annual').textContent = '$' + (waste * 12).toLocaleString();
+    prevStats = { total, waste, annual };
     renderChart();
+    renderBudget(total);
   }
+
+  /* ---------- Budget bar ---------- */
+  function renderBudget(total) {
+    const fill = document.getElementById('budget-fill');
+    const caption = document.getElementById('budget-caption');
+    if (!fill || !caption) return;
+    const pct = monthlyBudget > 0 ? Math.min((total / monthlyBudget) * 100, 100) : 0;
+    fill.style.width = pct + '%';
+    fill.classList.remove('warn', 'over');
+    if (total > monthlyBudget) {
+      fill.classList.add('over');
+      caption.textContent = '$' + total + ' of $' + monthlyBudget + ' budget — over by $' + (total - monthlyBudget) + '.';
+    } else if (total / monthlyBudget > 0.7) {
+      fill.classList.add('warn');
+      caption.textContent = '$' + total + ' of $' + monthlyBudget + ' budget — getting close.';
+    } else {
+      caption.textContent = '$' + total + ' of $' + monthlyBudget + ' budget.';
+    }
+  }
+  document.getElementById('budget-input').addEventListener('input', (e) => {
+    monthlyBudget = parseFloat(e.target.value) || 0;
+    renderBudget(subs.reduce((s, x) => s + x.price, 0));
+  });
+
+  /* ---------- Onboarding checklist ---------- */
+  function renderOnboard() {
+    ['add', 'invite', 'export'].forEach(key => {
+      const el = document.getElementById('onboard-' + key);
+      if (el) el.classList.toggle('done', onboardState[key]);
+    });
+    if (onboardState.add && onboardState.invite && onboardState.export) {
+      setTimeout(() => {
+        const card = document.getElementById('onboard-card');
+        if (card) card.style.display = 'none';
+      }, 900);
+    }
+  }
+  document.getElementById('onboard-close').addEventListener('click', () => {
+    document.getElementById('onboard-card').style.display = 'none';
+  });
+
+  /* ---------- Notification bell ---------- */
+  function renderBell() {
+    const badge = document.getElementById('bell-badge');
+    if (unreadCount > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = unreadCount;
+    } else {
+      badge.style.display = 'none';
+    }
+    const dropdown = document.getElementById('bell-dropdown');
+    if (activity.length === 0) {
+      dropdown.innerHTML = '<div class="activity-item"><span>No notifications yet.</span></div>';
+    } else {
+      dropdown.innerHTML = activity.slice(0, 6).map(a =>
+        '<div class="activity-item"><span class="a-tag">' + escapeHtml(a.text) + '</span></div>'
+      ).join('');
+    }
+  }
+  document.getElementById('bell-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dd = document.getElementById('bell-dropdown');
+    dd.classList.toggle('show');
+    document.getElementById('avatar-dropdown').classList.remove('show');
+    if (dd.classList.contains('show')) { unreadCount = 0; renderBell(); }
+  });
+
+  /* ---------- Avatar dropdown ---------- */
+  document.getElementById('avatar-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('avatar-dropdown').classList.toggle('show');
+    document.getElementById('bell-dropdown').classList.remove('show');
+  });
+  document.querySelectorAll('.avatar-dropdown [data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelector('.dash-tab[data-tab="' + btn.dataset.tab + '"]').click();
+      document.getElementById('avatar-dropdown').classList.remove('show');
+    });
+  });
+  document.getElementById('avatar-signout').addEventListener('click', () => {
+    document.getElementById('avatar-dropdown').classList.remove('show');
+    exitDashboard();
+  });
+  document.addEventListener('click', () => {
+    document.getElementById('bell-dropdown').classList.remove('show');
+    document.getElementById('avatar-dropdown').classList.remove('show');
+  });
+
+  /* ---------- Command palette ---------- */
+  const cmdkOverlay = document.getElementById('cmdk-overlay');
+  const cmdkInput = document.getElementById('cmdk-input');
+  const cmdkList = document.getElementById('cmdk-list');
+
+  function getCommands() {
+    return [
+      { label: 'Add subscription', tag: 'Subscriptions', run: () => { document.querySelector('.dash-tab[data-tab="subs"]').click(); document.getElementById('add-sub-form').classList.add('show'); } },
+      { label: 'Export CSV', tag: 'Subscriptions', run: () => document.getElementById('export-csv').click() },
+      { label: 'Invite teammate', tag: 'Team', run: () => { document.querySelector('.dash-tab[data-tab="team"]').click(); document.getElementById('invite-form').classList.add('show'); } },
+      { label: 'Go to Overview', tag: 'Nav', run: () => document.querySelector('.dash-tab[data-tab="overview"]').click() },
+      { label: 'Go to Subscriptions', tag: 'Nav', run: () => document.querySelector('.dash-tab[data-tab="subs"]').click() },
+      { label: 'Go to Team', tag: 'Nav', run: () => document.querySelector('.dash-tab[data-tab="team"]').click() },
+      { label: 'Go to Billing', tag: 'Nav', run: () => document.querySelector('.dash-tab[data-tab="billing"]').click() },
+      { label: 'Go to Settings', tag: 'Nav', run: () => document.querySelector('.dash-tab[data-tab="settings"]').click() },
+      { label: 'Sign out', tag: 'Account', run: () => exitDashboard() }
+    ];
+  }
+
+  function renderCmdk(query) {
+    const q = (query || '').toLowerCase();
+    const items = getCommands().filter(c => c.label.toLowerCase().includes(q));
+    if (items.length === 0) {
+      cmdkList.innerHTML = '<div class="cmdk-empty">No matching commands.</div>';
+      return;
+    }
+    cmdkList.innerHTML = items.map((c, i) =>
+      '<div class="cmdk-item' + (i === 0 ? ' selected' : '') + '" data-index="' + i + '"><span>' + escapeHtml(c.label) + '</span><span class="cmdk-tag">' + c.tag + '</span></div>'
+    ).join('');
+    cmdkList.querySelectorAll('.cmdk-item').forEach((el, i) => {
+      el.addEventListener('click', () => { items[i].run(); closeCmdk(); });
+    });
+  }
+
+  function openCmdk() {
+    if (!document.body.classList.contains('in-dashboard')) return;
+    cmdkOverlay.classList.add('show');
+    cmdkInput.value = '';
+    renderCmdk('');
+    setTimeout(() => cmdkInput.focus(), 30);
+  }
+  function closeCmdk() { cmdkOverlay.classList.remove('show'); }
+
+  document.getElementById('cmdk-trigger').addEventListener('click', openCmdk);
+  cmdkOverlay.addEventListener('click', (e) => { if (e.target === cmdkOverlay) closeCmdk(); });
+  cmdkInput.addEventListener('input', (e) => renderCmdk(e.target.value));
+  cmdkInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const first = cmdkList.querySelector('.cmdk-item');
+      if (first) first.click();
+    }
+    if (e.key === 'Escape') closeCmdk();
+  });
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      cmdkOverlay.classList.contains('show') ? closeCmdk() : openCmdk();
+    }
+  });
 
   /* ---------- Spend trend chart (illustrative, derived from live totals) ---------- */
   function renderChart() {
@@ -1573,12 +2072,13 @@
     const el = document.getElementById('team-list');
     if (!el) return;
     el.innerHTML = team.map(m => `
-      <div class="sub-row" data-team-id="${m.id}">
+      <div class="sub-row row-enter" data-team-id="${m.id}">
         <div class="sub-main">
           <span class="sub-name">${escapeHtml(m.name)}</span>
           <span class="sub-note">${escapeHtml(m.email)}</span>
         </div>
         <span class="badge keep">${escapeHtml(m.role)}</span>
+        <span></span>
         <span></span>
         <div class="row-actions">
           <button class="danger team-remove-btn" data-id="${m.id}">Remove</button>
@@ -1613,6 +2113,8 @@
     inviteForm.classList.remove('show');
     logActivity('Invited ' + name + ' as ' + role);
     toast(name + ' invited as ' + role + '.');
+    onboardState.invite = true;
+    renderOnboard();
   });
 
   /* ---------- Billing: mock invoice history ---------- */
@@ -1633,7 +2135,8 @@
     let result = subs.filter(s => {
       const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFilter = filterStatus === 'all' || s.status === filterStatus;
-      return matchesSearch && matchesFilter;
+      const matchesCategory = categoryFilter === 'all' || s.category === categoryFilter;
+      return matchesSearch && matchesFilter && matchesCategory;
     });
     if (sortMode === 'price-desc') result = result.slice().sort((a, b) => b.price - a.price);
     if (sortMode === 'price-asc') result = result.slice().sort((a, b) => a.price - b.price);
@@ -1655,14 +2158,15 @@
       renderStats();
       return;
     }
-    list.innerHTML = filtered.map(s => `
-      <div class="sub-row ${s.status}" data-id="${s.id}">
+    list.innerHTML = filtered.map((s, i) => `
+      <div class="sub-row ${s.status} row-enter" style="animation-delay:${i * 40}ms" data-id="${s.id}">
         <span class="laser"></span>
         <div class="sub-main">
           <span class="sub-name">${escapeHtml(s.name)}</span>
           <span class="sub-note">${escapeHtml(s.note)}</span>
         </div>
         <span class="sub-price">$${s.price}/mo</span>
+        <span class="cat-tag">${escapeHtml(s.category || 'Other')}</span>
         <span class="badge ${s.status}">${s.status === 'cut' ? 'Cut' : 'Keep'}</span>
         <div class="row-actions">
           <button class="toggle-btn" data-id="${s.id}">${s.status === 'cut' ? 'Keep instead' : 'Cut this'}</button>
@@ -1683,6 +2187,10 @@
     searchQuery = e.target.value;
     renderSubscriptions();
   });
+  document.getElementById('sub-category-filter').addEventListener('change', (e) => {
+    categoryFilter = e.target.value;
+    renderSubscriptions();
+  });
   document.querySelectorAll('.chip').forEach(chip => {
     chip.addEventListener('click', () => {
       document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -1697,9 +2205,9 @@
   });
 
   document.getElementById('export-csv').addEventListener('click', () => {
-    const header = 'Name,Price/mo,Status,Note\n';
+    const header = 'Name,Price/mo,Status,Category,Note\n';
     const rows = subs.map(s =>
-      [s.name, s.price, s.status, s.note].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')
+      [s.name, s.price, s.status, s.category || 'Other', s.note].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')
     ).join('\n');
     const blob = new Blob([header + rows], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -1711,18 +2219,25 @@
     a.remove();
     URL.revokeObjectURL(url);
     toast('CSV exported — check your downloads.');
+    onboardState.export = true;
+    renderOnboard();
   });
 
   function toggleStatus(id) {
     const s = subs.find(x => x.id === id);
     if (!s) return;
+    const prevStatus = s.status;
     s.status = s.status === 'cut' ? 'keep' : 'cut';
     renderSubscriptions();
     if (s.status === 'cut') {
       const row = document.querySelector('.sub-row[data-id="' + id + '"]');
       if (row) burstSparks(row);
       logActivity('✂ Cut — ' + s.name + ' ($' + s.price + '/mo)');
-      toast(s.name + ' cut — saving $' + s.price + '/mo.', 'ember');
+      toast(s.name + ' cut — saving $' + s.price + '/mo.', 'ember', () => {
+        s.status = prevStatus;
+        renderSubscriptions();
+        logActivity('Undo — restored ' + s.name);
+      });
     } else {
       logActivity('✓ Kept — ' + s.name);
       toast(s.name + ' kept.');
@@ -1731,11 +2246,16 @@
 
   function deleteSub(id) {
     const s = subs.find(x => x.id === id);
+    const idx = subs.findIndex(x => x.id === id);
     subs = subs.filter(x => x.id !== id);
     renderSubscriptions();
     if (s) {
       logActivity('Removed — ' + s.name);
-      toast(s.name + ' removed.', 'ember');
+      toast(s.name + ' removed.', 'ember', () => {
+        subs.splice(idx, 0, s);
+        renderSubscriptions();
+        logActivity('Undo — restored ' + s.name);
+      });
     }
   }
 
@@ -1752,16 +2272,19 @@
     const name = document.getElementById('add-name').value.trim();
     const price = parseFloat(document.getElementById('add-price').value);
     const usage = document.getElementById('add-usage').value;
+    const category = document.getElementById('add-category').value;
     if (!name || isNaN(price)) return;
 
     const suggestedCut = (usage === 'Unused 30+ days' || usage === 'Never used');
-    const newSub = { id: nextId++, name: name, price: price, note: usage, status: suggestedCut ? 'cut' : 'keep' };
+    const newSub = { id: nextId++, name: name, price: price, note: usage, status: suggestedCut ? 'cut' : 'keep', category: category };
     subs.push(newSub);
     renderSubscriptions();
     addForm.reset();
     addForm.classList.remove('show');
     logActivity('+ Added — ' + name + (suggestedCut ? ' (flagged for cut)' : ''));
     toast('Added ' + name + (suggestedCut ? ' — flagged as waste.' : '.'), suggestedCut ? 'ember' : undefined);
+    onboardState.add = true;
+    renderOnboard();
 
     if (suggestedCut) {
       setTimeout(() => {
