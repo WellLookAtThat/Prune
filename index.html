@@ -690,7 +690,7 @@
   .sub-row {
     position: relative;
     display: grid;
-    grid-template-columns: 2fr auto auto auto auto;
+    grid-template-columns: auto 2fr auto auto auto auto;
     gap: 16px;
     align-items: center;
     padding: 16px 20px;
@@ -791,12 +791,14 @@
   @media (max-width: 640px) {
     .stat-grid { grid-template-columns: repeat(2, 1fr); }
     .add-row-form { grid-template-columns: 1fr; }
-    .sub-row { grid-template-columns: 1fr auto; }
-    .sub-row .badge { grid-column: 1/-1; }
+    .sub-row { grid-template-columns: auto 1fr auto; }
     .sub-row .cat-tag { grid-column: 1/-1; }
+    .sub-row .badge { grid-column: 1/-1; }
     .sub-row .row-actions { grid-column: 1/-1; }
     .topbar-right { gap: 8px; }
     .cmdk-trigger span:first-child { display: none; }
+    .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    .sub-detail-inner { grid-template-columns: 1fr; }
   }
 
   /* CHART */
@@ -1173,6 +1175,146 @@
   @media (prefers-reduced-motion: reduce) {
     .row-enter, .dash-panel.active { animation: none !important; }
   }
+
+  /* QUICK ACTIONS */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .quick-action {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    color: var(--ice);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    text-align: left;
+    transition: border-color 0.2s ease, transform 0.15s ease;
+  }
+  .quick-action:hover { border-color: var(--acid); transform: translateY(-2px); }
+  .qa-icon { font-size: 18px; }
+
+  /* INSIGHTS */
+  .insights-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; }
+  .insight-item {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--violet);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ice);
+  }
+  .insight-item.warn { border-left-color: var(--ember); }
+  .insight-item.good { border-left-color: var(--acid); }
+
+  /* INTEGRATIONS */
+  .integration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .integration-card {
+    background: var(--void-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .integration-card .int-top { display: flex; align-items: center; gap: 12px; }
+  .integration-card .int-icon {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: var(--void-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .integration-card .int-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; }
+  .integration-card .int-desc { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); }
+  .int-connect-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    background: none;
+    color: var(--ice);
+    cursor: pointer;
+  }
+  .int-connect-btn.connected { border-color: var(--acid); color: var(--acid); }
+  .int-connect-btn:hover { border-color: var(--ice); }
+
+  /* BULK ACTIONS BAR */
+  .bulk-bar {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--void-3);
+    border: 1px solid var(--violet);
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ice);
+  }
+  .bulk-bar.show { display: flex; }
+  .bulk-actions { display: flex; gap: 8px; }
+  .select-all-row {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--smoke);
+  }
+  .select-all-row label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .row-check { width: 15px; height: 15px; accent-color: var(--acid); cursor: pointer; }
+
+  /* ROW DETAIL EXPAND */
+  .sub-detail {
+    grid-column: 1 / -1;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .sub-row.expanded .sub-detail { max-height: 160px; }
+  .sub-detail-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px 4px 4px;
+    border-top: 1px dashed var(--line);
+    margin-top: 12px;
+  }
+  .sub-detail-field { font-size: 11px; color: var(--smoke); }
+  .sub-detail-field b { color: var(--ice); display: block; font-size: 12px; margin-top: 2px; }
+  .sub-detail-notes {
+    grid-column: 1 / -1;
+    width: 100%;
+    background: var(--void);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--ice);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 44px;
+  }
+  .sub-name { cursor: pointer; }
+  .sub-name:hover { color: var(--acid); }
     .steps { grid-template-columns: 1fr; }
     .line-item { grid-template-columns: 1fr auto; }
     .li-price { grid-row: 1; }
@@ -1387,6 +1529,7 @@
       <button class="dash-tab" data-tab="subs">Subscriptions</button>
       <button class="dash-tab" data-tab="team">Team</button>
       <button class="dash-tab" data-tab="billing">Billing</button>
+      <button class="dash-tab" data-tab="integrations">Integrations</button>
       <button class="dash-tab" data-tab="settings">Settings</button>
     </div>
 
@@ -1414,6 +1557,16 @@
         <div class="stat-card"><div class="stat-label">Tools tracked</div><div class="stat-value" id="stat-tools">0</div></div>
         <div class="stat-card acid"><div class="stat-label">Annual savings if cut</div><div class="stat-value" id="stat-annual">$0</div></div>
       </div>
+
+      <div class="quick-actions">
+        <button class="quick-action" id="qa-add"><span class="qa-icon">＋</span>Add subscription</button>
+        <button class="quick-action" id="qa-invite"><span class="qa-icon">👤</span>Invite teammate</button>
+        <button class="quick-action" id="qa-export"><span class="qa-icon">⬇</span>Export report</button>
+        <button class="quick-action" id="qa-cmdk"><span class="qa-icon">⌘</span>Command palette</button>
+      </div>
+
+      <div class="dash-section-head"><h3>Insights</h3></div>
+      <div class="insights-list" id="insights-list"></div>
 
       <div class="dash-section-head"><h3>Spend trend</h3><span class="chart-note">illustrative — connects to real history once billing is linked</span></div>
       <div class="chart-card">
@@ -1456,6 +1609,16 @@
         </select>
       </div>
 
+      <div class="bulk-bar" id="bulk-bar">
+        <span id="bulk-count">0 selected</span>
+        <div class="bulk-actions">
+          <button class="btn ghost" id="bulk-cut" style="padding:8px 14px;font-size:12px;">Cut selected</button>
+          <button class="btn ghost" id="bulk-keep" style="padding:8px 14px;font-size:12px;">Keep selected</button>
+          <button class="btn ghost" id="bulk-export" style="padding:8px 14px;font-size:12px;">Export selected</button>
+          <button class="btn ghost" id="bulk-clear" style="padding:8px 14px;font-size:12px;">Clear</button>
+        </div>
+      </div>
+
       <div class="terminal">
         <div class="terminal-bar">
           <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
@@ -1481,6 +1644,9 @@
           <button type="submit" class="btn primary" style="padding:9px 14px;font-size:12px;">Save</button>
           <button type="button" class="btn ghost" id="cancel-add-form" style="padding:9px 14px;font-size:12px;">Cancel</button>
         </form>
+        <div class="select-all-row">
+          <label><input type="checkbox" id="select-all-cb"> Select all</label>
+        </div>
         <div id="sub-list"></div>
       </div>
     </div>
@@ -1541,6 +1707,14 @@
         <h4>Invoice history</h4>
         <div class="invoice-list" id="invoice-list"></div>
       </div>
+    </div>
+
+    <div class="dash-panel" id="panel-integrations">
+      <div class="dash-section-head">
+        <h3>Integrations</h3>
+        <span class="chart-note">connect the tools you want Prune watching</span>
+      </div>
+      <div class="integration-grid" id="integration-grid"></div>
     </div>
 
     <div class="dash-panel" id="panel-settings">
@@ -1759,6 +1933,7 @@
     renderInvoices();
     renderOnboard();
     renderBell();
+    renderIntegrations();
     toast('Welcome back, admin.');
   }
 
@@ -1781,11 +1956,11 @@
 
   /* ---------- Dashboard state ---------- */
   let subs = [
-    { id: 1, name: 'ChatGPT Team', price: 30, note: 'used by 6/6 seats, daily', status: 'keep', category: 'Writing' },
-    { id: 2, name: 'Notion AI', price: 20, note: 'unused 34 days · 1 seat active', status: 'cut', category: 'Productivity' },
-    { id: 3, name: 'Midjourney', price: 30, note: 'used by design team, daily', status: 'keep', category: 'Design' },
-    { id: 4, name: 'Jasper', price: 49, note: 'unused 61 days', status: 'cut', category: 'Writing' },
-    { id: 5, name: 'Copy.ai', price: 36, note: 'overlaps ChatGPT, barely used', status: 'cut', category: 'Writing' }
+    { id: 1, name: 'ChatGPT Team', price: 30, note: 'used by 6/6 seats, daily', status: 'keep', category: 'Writing', owner: 'admin@acmestudio.demo', renews: 'Jul 14, 2026', notes: '' },
+    { id: 2, name: 'Notion AI', price: 20, note: 'unused 34 days · 1 seat active', status: 'cut', category: 'Productivity', owner: 'sam@acmestudio.demo', renews: 'Jul 03, 2026', notes: '' },
+    { id: 3, name: 'Midjourney', price: 30, note: 'used by design team, daily', status: 'keep', category: 'Design', owner: 'jo@acmestudio.demo', renews: 'Jul 22, 2026', notes: '' },
+    { id: 4, name: 'Jasper', price: 49, note: 'unused 61 days', status: 'cut', category: 'Writing', owner: 'admin@acmestudio.demo', renews: 'Jul 09, 2026', notes: '' },
+    { id: 5, name: 'Copy.ai', price: 36, note: 'overlaps ChatGPT, barely used', status: 'cut', category: 'Writing', owner: 'sam@acmestudio.demo', renews: 'Jul 17, 2026', notes: '' }
   ];
   let nextId = 6;
   let activity = [];
@@ -1796,6 +1971,8 @@
   let unreadCount = 0;
   let onboardState = { add: false, invite: false, export: false };
   let monthlyBudget = 150;
+  let selectedIds = new Set();
+  let expandedId = null;
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -1873,6 +2050,42 @@
     prevStats = { total, waste, annual };
     renderChart();
     renderBudget(total);
+    renderInsights();
+  }
+
+  /* ---------- Insights: auto-generated from live state ---------- */
+  function renderInsights() {
+    const el = document.getElementById('insights-list');
+    if (!el) return;
+    const cutItems = subs.filter(x => x.status === 'cut');
+    const keepItems = subs.filter(x => x.status === 'keep');
+    const waste = cutItems.reduce((s, x) => s + x.price, 0);
+    const insights = [];
+
+    if (cutItems.length > 0) {
+      insights.push({ tone: 'warn', text: cutItems.length + ' tool' + (cutItems.length > 1 ? 's' : '') + ' flagged for cut, worth $' + waste + '/mo ($' + (waste * 12).toLocaleString() + '/yr) if you follow through.' });
+    } else {
+      insights.push({ tone: 'good', text: 'Nothing currently flagged for cut — your stack looks lean.' });
+    }
+
+    if (subs.length > 0) {
+      const byCategory = {};
+      cutItems.forEach(x => { byCategory[x.category || 'Other'] = (byCategory[x.category || 'Other'] || 0) + x.price; });
+      const topCat = Object.entries(byCategory).sort((a, b) => b[1] - a[1])[0];
+      if (topCat) insights.push({ tone: 'default', text: '"' + topCat[0] + '" is your highest-waste category at $' + topCat[1] + '/mo.' });
+    }
+
+    const mostExpensiveKeep = keepItems.slice().sort((a, b) => b.price - a.price)[0];
+    if (mostExpensiveKeep) {
+      insights.push({ tone: 'default', text: mostExpensiveKeep.name + ' is your priciest active tool at $' + mostExpensiveKeep.price + '/mo — make sure it is earning that.' });
+    }
+
+    const total = subs.reduce((s, x) => s + x.price, 0);
+    if (total > monthlyBudget) {
+      insights.push({ tone: 'warn', text: 'You are $' + (total - monthlyBudget) + ' over your $' + monthlyBudget + ' monthly budget.' });
+    }
+
+    el.innerHTML = insights.map(i => '<div class="insight-item ' + i.tone + '">' + escapeHtml(i.text) + '</div>').join('');
   }
 
   /* ---------- Budget bar ---------- */
@@ -2073,8 +2286,9 @@
     if (!el) return;
     el.innerHTML = team.map(m => `
       <div class="sub-row row-enter" data-team-id="${m.id}">
+        <span></span>
         <div class="sub-main">
-          <span class="sub-name">${escapeHtml(m.name)}</span>
+          <span class="sub-name" style="cursor:default;">${escapeHtml(m.name)}</span>
           <span class="sub-note">${escapeHtml(m.email)}</span>
         </div>
         <span class="badge keep">${escapeHtml(m.role)}</span>
@@ -2091,6 +2305,46 @@
         team = team.filter(x => x.id !== parseInt(btn.dataset.id, 10));
         renderTeam();
         if (m) { logActivity('Removed team member — ' + m.name); toast(m.name + ' removed from team.', 'ember'); }
+      });
+    });
+  }
+
+  /* ---------- Integrations ---------- */
+  let integrations = [
+    { id: 'chatgpt', name: 'ChatGPT', icon: '💬', desc: 'Team & Enterprise plans', connected: true },
+    { id: 'claude', name: 'Claude', icon: '✳️', desc: 'Pro & Team seats', connected: false },
+    { id: 'notion', name: 'Notion AI', icon: '📝', desc: 'Workspace add-on', connected: true },
+    { id: 'midjourney', name: 'Midjourney', icon: '🎨', desc: 'Image generation', connected: true },
+    { id: 'jasper', name: 'Jasper', icon: '✍️', desc: 'Marketing copy', connected: false },
+    { id: 'copilot', name: 'GitHub Copilot', icon: '🧑\u200d💻', desc: 'Dev seats', connected: false },
+    { id: 'canva', name: 'Canva', icon: '🖼️', desc: 'Design & templates', connected: false },
+    { id: 'copyai', name: 'Copy.ai', icon: '🪶', desc: 'Content generation', connected: true }
+  ];
+
+  function renderIntegrations() {
+    const el = document.getElementById('integration-grid');
+    if (!el) return;
+    el.innerHTML = integrations.map(i => `
+      <div class="integration-card">
+        <div class="int-top">
+          <div class="int-icon">${i.icon}</div>
+          <div>
+            <div class="int-name">${escapeHtml(i.name)}</div>
+            <div class="int-desc">${escapeHtml(i.desc)}</div>
+          </div>
+        </div>
+        <button class="int-connect-btn ${i.connected ? 'connected' : ''}" data-id="${i.id}">
+          ${i.connected ? '✓ Connected' : 'Connect'}
+        </button>
+      </div>
+    `).join('');
+    document.querySelectorAll('.int-connect-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = integrations.find(x => x.id === btn.dataset.id);
+        item.connected = !item.connected;
+        renderIntegrations();
+        toast(item.name + (item.connected ? ' connected.' : ' disconnected.'), item.connected ? undefined : 'ember');
+        logActivity((item.connected ? 'Connected ' : 'Disconnected ') + item.name);
       });
     });
   }
@@ -2159,10 +2413,11 @@
       return;
     }
     list.innerHTML = filtered.map((s, i) => `
-      <div class="sub-row ${s.status} row-enter" style="animation-delay:${i * 40}ms" data-id="${s.id}">
+      <div class="sub-row ${s.status} row-enter ${expandedId === s.id ? 'expanded' : ''}" style="animation-delay:${i * 40}ms" data-id="${s.id}">
         <span class="laser"></span>
+        <input type="checkbox" class="row-check" data-id="${s.id}" ${selectedIds.has(s.id) ? 'checked' : ''}>
         <div class="sub-main">
-          <span class="sub-name">${escapeHtml(s.name)}</span>
+          <span class="sub-name" data-id="${s.id}">${escapeHtml(s.name)}</span>
           <span class="sub-note">${escapeHtml(s.note)}</span>
         </div>
         <span class="sub-price">$${s.price}/mo</span>
@@ -2171,6 +2426,13 @@
         <div class="row-actions">
           <button class="toggle-btn" data-id="${s.id}">${s.status === 'cut' ? 'Keep instead' : 'Cut this'}</button>
           <button class="danger delete-btn" data-id="${s.id}">Remove</button>
+        </div>
+        <div class="sub-detail">
+          <div class="sub-detail-inner">
+            <div class="sub-detail-field">Owner<b>${escapeHtml(s.owner || 'Unassigned')}</b></div>
+            <div class="sub-detail-field">Renews<b>${escapeHtml(s.renews || '—')}</b></div>
+            <textarea class="sub-detail-notes" data-id="${s.id}" placeholder="Add a note about this tool…">${escapeHtml(s.notes || '')}</textarea>
+          </div>
         </div>
       </div>
     `).join('');
@@ -2181,7 +2443,86 @@
     document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', () => deleteSub(parseInt(btn.dataset.id, 10)));
     });
+    document.querySelectorAll('.sub-name[data-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = parseInt(el.dataset.id, 10);
+        expandedId = expandedId === id ? null : id;
+        renderSubscriptions();
+      });
+    });
+    document.querySelectorAll('.sub-detail-notes').forEach(el => {
+      el.addEventListener('click', (e) => e.stopPropagation());
+      el.addEventListener('blur', () => {
+        const s = subs.find(x => x.id === parseInt(el.dataset.id, 10));
+        if (s) s.notes = el.value;
+      });
+    });
+    document.querySelectorAll('.row-check').forEach(cb => {
+      cb.addEventListener('click', (e) => e.stopPropagation());
+      cb.addEventListener('change', () => {
+        const id = parseInt(cb.dataset.id, 10);
+        if (cb.checked) selectedIds.add(id); else selectedIds.delete(id);
+        renderBulkBar();
+      });
+    });
   }
+
+  /* ---------- Bulk selection ---------- */
+  function renderBulkBar() {
+    const bar = document.getElementById('bulk-bar');
+    const count = document.getElementById('bulk-count');
+    if (selectedIds.size > 0) {
+      bar.classList.add('show');
+      count.textContent = selectedIds.size + ' selected';
+    } else {
+      bar.classList.remove('show');
+    }
+    const selectAll = document.getElementById('select-all-cb');
+    const visibleIds = getFilteredSubs().map(s => s.id);
+    selectAll.checked = visibleIds.length > 0 && visibleIds.every(id => selectedIds.has(id));
+  }
+
+  document.getElementById('select-all-cb').addEventListener('change', (e) => {
+    const visibleIds = getFilteredSubs().map(s => s.id);
+    if (e.target.checked) visibleIds.forEach(id => selectedIds.add(id));
+    else visibleIds.forEach(id => selectedIds.delete(id));
+    renderSubscriptions();
+    renderBulkBar();
+  });
+
+  document.getElementById('bulk-cut').addEventListener('click', () => {
+    subs.forEach(s => { if (selectedIds.has(s.id)) s.status = 'cut'; });
+    toast(selectedIds.size + ' subscriptions cut.', 'ember');
+    logActivity('✂ Bulk cut — ' + selectedIds.size + ' subscriptions');
+    selectedIds.clear();
+    renderSubscriptions();
+    renderBulkBar();
+  });
+  document.getElementById('bulk-keep').addEventListener('click', () => {
+    subs.forEach(s => { if (selectedIds.has(s.id)) s.status = 'keep'; });
+    toast(selectedIds.size + ' subscriptions kept.');
+    logActivity('✓ Bulk kept — ' + selectedIds.size + ' subscriptions');
+    selectedIds.clear();
+    renderSubscriptions();
+    renderBulkBar();
+  });
+  document.getElementById('bulk-export').addEventListener('click', () => {
+    const chosen = subs.filter(s => selectedIds.has(s.id));
+    const header = 'Name,Price/mo,Status,Category,Note\n';
+    const rows = chosen.map(s => [s.name, s.price, s.status, s.category || 'Other', s.note].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+    const blob = new Blob([header + rows], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'prune-selected.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast('Exported ' + chosen.length + ' selected subscriptions.');
+  });
+  document.getElementById('bulk-clear').addEventListener('click', () => {
+    selectedIds.clear();
+    renderSubscriptions();
+    renderBulkBar();
+  });
 
   document.getElementById('sub-search').addEventListener('input', (e) => {
     searchQuery = e.target.value;
@@ -2276,7 +2617,7 @@
     if (!name || isNaN(price)) return;
 
     const suggestedCut = (usage === 'Unused 30+ days' || usage === 'Never used');
-    const newSub = { id: nextId++, name: name, price: price, note: usage, status: suggestedCut ? 'cut' : 'keep', category: category };
+    const newSub = { id: nextId++, name: name, price: price, note: usage, status: suggestedCut ? 'cut' : 'keep', category: category, owner: 'admin@acmestudio.demo', renews: 'Not set', notes: '' };
     subs.push(newSub);
     renderSubscriptions();
     addForm.reset();
@@ -2298,6 +2639,21 @@
   document.querySelectorAll('[data-toggle]').forEach(sw => {
     sw.addEventListener('click', () => sw.classList.toggle('on'));
   });
+
+  /* ---------- Overview quick actions ---------- */
+  document.getElementById('qa-add').addEventListener('click', () => {
+    document.querySelector('.dash-tab[data-tab="subs"]').click();
+    setTimeout(() => document.getElementById('add-sub-form').classList.add('show'), 100);
+  });
+  document.getElementById('qa-invite').addEventListener('click', () => {
+    document.querySelector('.dash-tab[data-tab="team"]').click();
+    setTimeout(() => document.getElementById('invite-form').classList.add('show'), 100);
+  });
+  document.getElementById('qa-export').addEventListener('click', () => {
+    document.querySelector('.dash-tab[data-tab="subs"]').click();
+    setTimeout(() => document.getElementById('export-csv').click(), 100);
+  });
+  document.getElementById('qa-cmdk').addEventListener('click', openCmdk);
 </script>
 
 </body>
