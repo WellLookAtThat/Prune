@@ -62,7 +62,7 @@
 .subCard.isCut{border-color:rgba(255,68,38,.35)}
 .subCard .nm{font-weight:800;cursor:pointer}.subCard .nm:hover{color:var(--ok)}
 .subCard .meta{color:var(--muted);font-size:12px;font-family:var(--mono)}
-.subCard .price{font-family:var(--mono);font-weight:700}
+.subCard .price{font-family:var(--mono);font-weight:700;font-size:16px;line-height:1;letter-spacing:0;margin:0}
 .subCard.isCut .price{color:#ff9d8a;text-decoration:line-through}
 .catChip{border:1px solid var(--accent2);color:var(--accent2);border-radius:999px;padding:4px 10px;font-size:11px;font-family:var(--mono);justify-self:start}
 .seatWrap{min-width:120px}
@@ -98,16 +98,47 @@
 @media(max-width:900px){.subCard{grid-template-columns:auto 1fr auto}.subCard .catChip,.subCard .seatWrap{display:none}.rowActs{grid-column:1/-1}.addForm{grid-template-columns:1fr 1fr}.subToolbar{align-items:stretch}}
 @media (prefers-reduced-motion:reduce){.pop,.toastCard,.bulkBar.show,.addForm.show{animation:none}.metric,.subCard,.intCard{transition:none}}
 
-  </style>
+  .whyGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:26px}
+.bigStat{border:1px solid var(--line);border-radius:24px;padding:28px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01))}
+.bigStat strong{display:block;font-size:clamp(44px,6vw,84px);letter-spacing:-.06em;font-family:var(--mono);color:var(--accent);margin-bottom:12px}
+.bigStat:nth-child(2) strong{color:var(--ok)}.bigStat:nth-child(3) strong{color:var(--accent2)}
+.calc{border:1px solid var(--line);border-radius:28px;padding:30px;background:var(--panel)}
+.calcHead{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.calcGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:24px}
+.calcField label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:10px;font-family:var(--mono)}
+.calcField b{color:var(--text)}
+.calcField input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.calcOut{display:flex;align-items:center;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:22px}
+.calcOut .small{max-width:340px}
+.calcOut strong{font-size:clamp(38px,5vw,64px);letter-spacing:-.06em;font-family:var(--mono);color:var(--accent);flex:1;text-align:center;transition:transform .2s}
+.calcOut strong.bump{transform:scale(1.06)}
+@media(max-width:900px){.whyGrid,.calcGrid{grid-template-columns:1fr}.calcOut{flex-direction:column;align-items:stretch;text-align:center}}
+</style>
 </head>
 <body>
   <div class="grain"></div><div class="cursorGlow"></div>
   <main id="site">
-    <nav class="nav"><a href="#overview" class="brand"><svg class="logoMark" viewBox="0 0 44 44" width="36" height="36" aria-hidden="true"><defs><linearGradient id="lgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4426"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><circle cx="22" cy="22" r="20" fill="none" stroke="url(#lgA)" stroke-width="2.5"/><path d="M11 31 C18 25 24 21 30 15" stroke="#8d94a3" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M15 26 q6 -7 11 -3 q-6 7 -11 3z" fill="#39ff88"/><path d="M28 18 l7 -7 M28 11 l7 7" stroke="#ff4426" stroke-width="3" stroke-linecap="round"/><path d="M36 8 l3 -3" stroke="#8d94a3" stroke-width="2.5" stroke-linecap="round" opacity=".55"/></svg><span>Prune</span></a><div class="navlinks"><a href="#audit">Audit</a><a href="#how">How</a><a href="#pricing">Pricing</a><button class="ghostBtn" id="menuBtn">Menu</button><button class="pill" id="signInTop">Sign in</button></div></nav>
-    <div class="menu" id="menu"><button id="closeBtn">Close</button><div><a href="#overview">Overview</a><a href="#audit">Live audit</a><a href="#how">Process</a><a href="#pricing">Pricing</a></div></div>
+    <nav class="nav"><a href="#overview" class="brand"><svg class="logoMark" viewBox="0 0 44 44" width="36" height="36" aria-hidden="true"><defs><linearGradient id="lgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4426"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><circle cx="22" cy="22" r="20" fill="none" stroke="url(#lgA)" stroke-width="2.5"/><path d="M11 31 C18 25 24 21 30 15" stroke="#8d94a3" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M15 26 q6 -7 11 -3 q-6 7 -11 3z" fill="#39ff88"/><path d="M28 18 l7 -7 M28 11 l7 7" stroke="#ff4426" stroke-width="3" stroke-linecap="round"/><path d="M36 8 l3 -3" stroke="#8d94a3" stroke-width="2.5" stroke-linecap="round" opacity=".55"/></svg><span>Prune</span></a><div class="navlinks"><a href="#audit">Audit</a><a href="#why">Why</a><a href="#how">How</a><a href="#pricing">Pricing</a><button class="ghostBtn" id="menuBtn">Menu</button><button class="pill" id="signInTop">Sign in</button></div></nav>
+    <div class="menu" id="menu"><button id="closeBtn">Close</button><div><a href="#overview">Overview</a><a href="#audit">Live audit</a><a href="#why">Why Prune</a><a href="#how">Process</a><a href="#pricing">Pricing</a></div></div>
     <section class="hero" id="overview"><div class="reveal"><div class="kicker">000 AI subscription audit</div><h1>Stop paying for AI tools you never touch.</h1><p class="lead">Prune watches every AI subscription your team pays for, tracks who's actually using what, and hands you a clean monthly cut list.</p><div class="actions"><button class="btn primary" id="joinBtn">Join the waitlist</button><button class="btn" id="demoBtn">Open demo dashboard</button></div><p class="small mono">Demo login: admin / pass. Real billing and auth can connect later.</p></div><div class="heroCard reveal"><div class="rings"></div><div class="scan"></div><div class="audit3d"><div class="seatRing"><i></i><i></i><i></i><i></i><i></i></div><div class="auditCore"></div><div class="auditCard cut"><b>Jasper flagged</b><span>0 seats active · cut $49/mo</span></div><div class="auditCard keep"><b>ChatGPT healthy</b><span>6/6 seats active · keep</span></div><div class="auditCard save"><b>Projected savings</b><span>$1,980/year from this audit</span></div></div><div class="stat one"><span class="small">Waste found</span><strong>$165/mo</strong></div><div class="stat two"><span class="small">Tools audited</span><strong>11</strong></div><div class="ticker"><div>CHATGPT - NOTION AI - MIDJOURNEY - JASPER - COPY.AI - GEMINI - CLAUDE - PERPLEXITY - </div></div></div></section>
     <section id="audit"><div class="sectionHead reveal"><span class="num">n.001 LIVE AUDIT n.001</span><h2>Watch Prune cut the fat.</h2></div><div class="auditTerminal reveal"><div class="termTop"><span class="dot"></span><span>prune --audit acme-studio.workspace</span></div><div class="auditRows" id="auditRows"></div></div></section>
     <section id="problem"><div class="sectionHead reveal"><span class="num">n.002 PROBLEM n.002</span><h2>Nobody signed up to be an AI subscription accountant.</h2></div><p class="lead reveal">Teams quietly collect overlapping AI subscriptions. One person tries a tool, another upgrades it, finance keeps paying, and nobody notices when it sits unused for months.</p></section>
+    <section id="why"><div class="sectionHead reveal"><span class="num">n.002a WHY n.002a</span><h2>Why teams need a pruner.</h2></div>
+      <div class="whyGrid">
+        <div class="bigStat reveal"><strong class="statNum" data-to="7" data-pre="3–">0</strong><p class="small">overlapping AI tools the average team quietly collects — one person trials it, another upgrades it, finance keeps paying.</p></div>
+        <div class="bigStat reveal"><strong class="statNum" data-to="1980" data-pre="$" data-suf="/yr">0</strong><p class="small">recovered in the sample audit on this page — from just three idle subscriptions nobody remembered owning.</p></div>
+        <div class="bigStat reveal"><strong class="statNum" data-to="5" data-suf=" min">0</strong><p class="small">from connecting billing to your first cut list. No new habits, no dashboard babysitting.</p></div>
+      </div>
+      <div class="calc reveal">
+        <div class="calcHead"><h3>What is your team leaking?</h3><span class="tag">illustrative estimate</span></div>
+        <div class="calcGrid">
+          <div class="calcField"><label>Team size <b id="cvTeam">8</b></label><input type="range" id="calcTeam" min="1" max="50" value="8"></div>
+          <div class="calcField"><label>AI tools in use <b id="cvTools">6</b></label><input type="range" id="calcTools" min="1" max="20" value="6"></div>
+          <div class="calcField"><label>Avg cost per tool, per seat / mo <b id="cvCost">$45</b></label><input type="range" id="calcCost" min="10" max="200" step="5" value="45"></div>
+        </div>
+        <div class="calcOut"><span class="small">Assuming about half your team holds a seat on each tool and a third of that spend sits idle — the pattern in the demo audit — you are leaking about</span><strong id="calcResult">$0/yr</strong><button class="btn primary" id="calcCta">Audit it with Prune</button></div>
+      </div>
+    </section>
     <section id="how"><div class="sectionHead reveal"><span class="num">n.003 HOW n.003</span><h2>Three steps. No new habits.</h2></div><div class="split"><div class="sticky reveal"><p class="small">Scroll through the cards. The landing story uses the mock's sticky kinetic section pattern, but the copy and product behaviour stay Prune.</p></div><div class="steps"><article class="step reveal"><b>01</b><div><h3>Connect</h3><p class="small">Forward receipts or connect your billing exports. Prune turns messy spend into one readable audit layer.</p></div></article><article class="step reveal"><b>02</b><div><h3>Track</h3><p class="small">Compare seats, usage signals, notes, renewals, owners, categories, and overlap risk across your team's AI stack.</p></div></article><article class="step reveal"><b>03</b><div><h3>Cut</h3><p class="small">Get a monthly report showing what earns its keep, what is idle, and what you can cancel first.</p></div></article></div></div></section>
     <section id="features"><div class="sectionHead reveal"><span class="num">n.004 FEATURES n.004</span><h2>Built for fast, honest cleanup.</h2></div><div class="grid3"><article class="card reveal"><div class="icon"><div class="node"></div></div><h3>Usage clarity</h3><p class="small">See active seats, idle tools, last-used timing, renewal risk, and owner notes in one place.</p><div class="big">01</div></article><article class="card reveal"><div class="icon"><div class="node"></div></div><h3>Cut list</h3><p class="small">Prioritize subscriptions by waste, overlap, cost, and confidence so the next move is obvious.</p><div class="big">02</div></article><article class="card reveal"><div class="icon"><div class="node"></div></div><h3>Demo dashboard</h3><p class="small">Search, filter, sort, select, export, add tools, connect mock integrations, and open command actions.</p><div class="big">03</div></article></div></section>
     <section id="where"><div class="sectionHead reveal"><span class="num">n.005 WHERE n.005</span><h2>One audit layer for every team.</h2></div><div class="industries reveal"><div class="industry"><h3>Design</h3></div><div class="industry"><h3>Marketing</h3></div><div class="industry"><h3>Operations</h3></div><div class="industry"><h3>Finance</h3></div></div></section>
@@ -465,6 +496,24 @@
 
     $('#globalSearch').addEventListener('input',()=>{if($('#app').classList.contains('open')){tab='Subscriptions';render();}});
 
+
+    /* ---------- Why section: counters + calculator ---------- */
+    const statObs=new IntersectionObserver(es=>es.forEach(e=>{
+      if(!e.isIntersecting)return;const el=e.target;statObs.unobserve(el);
+      const to=+el.dataset.to,pre=el.dataset.pre||'',suf=el.dataset.suf||'',t0=performance.now();
+      (function st(now){const p=Math.min((now-t0)/900,1),ease=1-Math.pow(1-p,3);
+        el.textContent=pre+Math.round(to*ease).toLocaleString()+suf;if(p<1)requestAnimationFrame(st);})(t0);
+    }),{threshold:.5});
+    $$('.statNum').forEach(el=>statObs.observe(el));
+    function calcUpdate(){
+      const team=+$('#calcTeam').value,tools=+$('#calcTools').value,cost=+$('#calcCost').value;
+      $('#cvTeam').textContent=team;$('#cvTools').textContent=tools;$('#cvCost').textContent='$'+cost;
+      const seats=Math.max(1,Math.ceil(team/2));const yearly=Math.round(tools*cost*seats*12*0.33);
+      const out=$('#calcResult');out.textContent='$'+yearly.toLocaleString()+'/yr';
+      out.classList.remove('bump');void out.offsetWidth;out.classList.add('bump');
+    }
+    if($('#calcTeam')){['calcTeam','calcTools','calcCost'].forEach(id=>$('#'+id).addEventListener('input',calcUpdate));calcUpdate();
+      $('#calcCta').onclick=openLogin;}
     /* ---------- Landing observers, menu, faq ---------- */
     const reveal=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.14});
     $$('.reveal').forEach(el=>reveal.observe(el));
